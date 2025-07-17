@@ -2,6 +2,7 @@ import { logout } from "../api/authService";
 import { addProduct, getProduct } from "../api/menuService";
 import { useAuth } from "../context/AuthContext";
 import { getUsernameFromEmail } from "../utils/string";
+import PageLayout from "./layouts/PageLayout";
 
 export default function Dashboard() {
     const { user } = useAuth();
@@ -11,12 +12,8 @@ export default function Dashboard() {
     // getProduct("81dQsvr9XA0bfJvQjPu0")
 
     return (
-        <div>
-            <h1>Bienvenue, {userName}</h1>
-            <button onClick={logout}>
-                Se déconnecter
-            </button> <br />
-            <button onClick={addProduct}>Ajouter un produit</button>
-        </div>
+        <PageLayout>
+            <p>container - Dashboard</p>
+        </PageLayout>
     )
 }
