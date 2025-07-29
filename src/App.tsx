@@ -2,8 +2,9 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css'
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-import Dashboard from './components/Dashboard';
 import LoginPage from './components/pages/LoginPage';
+import ProductsPage from './components/pages/ProductsPage';
+import ErrorPage from './components/pages/ErrorPage';
 
 function App() {
   const { user, loading } = useAuth();
@@ -12,18 +13,20 @@ function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<Navigate to={user ? "/dashboard" : "/login"} />} />
+      <Route path="/" element={<Navigate to={user ? "/produits" : "/login"} />} />
       {/* <Route path="/login" element={<AuthForm />} /> */}
       <Route path="/login" element={<LoginPage />} />
 
       <Route
-        path="/dashboard"
+        path="/produits"
         element={
           <ProtectedRoute>
-            <Dashboard />
+            <ProductsPage />
           </ProtectedRoute>
         }
       />
+      
+      <Route path="*" element={<ErrorPage />} />
     </Routes>
   )
 }
