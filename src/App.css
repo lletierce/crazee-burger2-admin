@@ -3,12 +3,14 @@
 
 @theme {
   --color-orange-primary: #ffa01b;
-  --font-amatic: "Amatic SC", "cursive"; 
+  --font-amatic: "Amatic SC", "cursive";
 }
 
-.custom-title {
+
+/* .custom-title {
   @apply text-orange-primary text-4xl leading-4 font-bold uppercase tracking-[1.5px] font-amatic
-}
+} */
+
 
 /* #root {
   max-width: 1280px;
