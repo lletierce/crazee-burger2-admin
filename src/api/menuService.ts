@@ -1,4 +1,4 @@
-import { collection, doc, getDoc, setDoc } from "firebase/firestore"
+import { collection, doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore"
 import { db } from "./firebase-config"
 
 
@@ -21,15 +21,22 @@ export const addProduct = async () => {
 
     // DATA
     const data = {
-        productName: "Nouveau produit",
+        id: crypto.randomUUID(),
+        imageSource: "https://crazee-burger-seven.vercel.app/images/logo-orange.png",
+        productName: "produit",
         price: 5.90,
-        quantity: -100,
+        quantity: 100,
+        isAvailable: true,
+        isPromoted: false,
+        productType: "Burger",
+        createdAt: serverTimestamp(),
+        lastUpdate: serverTimestamp(),
     }
 
     try {
         // SetDoc(PATH, DATA)
         await setDoc(newDocRef, data)
-        console.log("Produit ajouté avec ID :", newDocRef.id);
+        // console.log("Produit ajouté avec ID :", newDocRef.id);
 
     }
     catch (err: any) {
