@@ -4,8 +4,8 @@ import LogoText from '../logo/LogoText'
 
 export default function Navbar() {
     return (
-        <nav>
-            <div className="md:hidden h-[8vh] flex flex-row items-center justify-between">
+        <nav className='relative'>
+            <div className="bg-yellow-400 md:hidden h-[8vh] min-h-[64px] w-full flex flex-row items-center justify-between fixed top-0 right-0 left-0 z-50">
                 <div className="pl-3 flex items-center h-full text-3xl">
                     <MdMenu />
                 </div>
