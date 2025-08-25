@@ -4,16 +4,6 @@ import Card from '../reusable-ui/card/Card';
 import { collection, getDocs, limit, orderBy, query, startAfter, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '../../api/firebase-config';
 
-type ProductType2 = {
-  id: string;
-  imageSource: string;
-  title: string;
-  price: number;
-  quantity: number;
-  isAvailable: boolean;
-  isPublicised: boolean;
-}
-
 
 export default function ProductsPage() {
 
@@ -74,63 +64,47 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
-  
+
   // affichage
   return (
     <PageLayout>
-      <div className="w-full min-h-screen p-4 flex flex-col gap-6">
-            {/* Grille responsive */}
-            <div className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-4">
-                {products.map((product) => (
-                    <div
-                        key={product.id}
-                        className="bg-blue-500 text-white flex items-center justify-center rounded-lg shadow-md h-40"
-                    >
-                        {product.productName  ?? "Sans nom"}
-                    </div>
-                ))}
+      <div className="w-full p-4 flex flex-col gap-6 md:h-[85vh] md:pr-0 md:overflow-y-scroll md:overflow-hidden">
+        {/* Grille responsive */}
+        <div className="
+          grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] 
+          gap-6 md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))]
+          md:gap-12
+          justify-items-center"
+        >
+          {products.map((product) => (
+            <div key={product.id}>
+              {/* {product.productName  ?? "Sans nom"} */}
+              <Card title={product.productName} />
             </div>
-
-            {/* Bouton "Voir plus" */}
-            {!noMore && (
-                <div className="flex justify-center">
-                    <button
-                        onClick={() => fetchProducts(true)}
-                        disabled={loading}
-                        className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition disabled:opacity-50 cursor-pointer"
-                    >
-                        {loading ? "Chargement..." : "Voir plus"}
-                    </button>
-                </div>
-            )}
-
-            {/* Message si plus de données */}
-            {noMore && (
-                <p className="text-center text-gray-500">Tous les produits sont affichés</p>
-            )}
+          ))}
         </div>
+
+        {/* Bouton "Voir plus" */}
+          {!noMore && (
+            <div className="flex justify-center pt-6">
+              <button
+                onClick={() => fetchProducts(true)}
+                disabled={loading}
+                className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition disabled:opacity-50 cursor-pointer"
+              >
+                {loading ? "Chargement..." : "Voir plus"}
+              </button>
+            </div>
+          )}
+
+        {/* Message si plus de données */}
+        {noMore && (
+          <p className="text-center text-gray-500">Tous les produits sont affichés</p>
+        )}
+      </div>
     </PageLayout>
   )
 }
-
-/*
-<div className='
-          my-6
-          grid
-          grid-cols-[repeat(auto-fit,minmax(180px,1fr))]
-          gap-6
-          md:grid-cols-[repeat(auto-fit,minmax(300px,1fr))]
-          md:gap-12
-         justify-items-center
-         overflow-y-clip
-          '>
-        {menu.map(({title})=>{
-          return (
-            <Card title={title}/>
-          )
-        })}
-      </div>
-*/
 
 
 // <button onClick={handleAddProduct}>Ajouter un produit</button>
