@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './components/pages/LoginPage';
 import ProductsPage from './components/pages/ProductsPage';
 import ErrorPage from './components/pages/ErrorPage';
+import ProductPage from './components/pages/ProductPage';
 
 function App() {
   const { user, loading } = useAuth();
@@ -23,9 +24,15 @@ function App() {
           <ProtectedRoute>
             <ProductsPage />
           </ProtectedRoute>
-        }
-      />
-      
+        }>
+      </Route>
+
+      <Route path="/produits/:id" element={
+        <ProtectedRoute>
+          <ProductPage />
+        </ProtectedRoute>
+      } />
+
       <Route path="*" element={<ErrorPage />} />
     </Routes>
   )

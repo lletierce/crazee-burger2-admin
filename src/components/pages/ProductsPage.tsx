@@ -3,6 +3,8 @@ import PageLayout from '../layouts/PageLayout';
 import Card from '../reusable-ui/card/Card';
 import { collection, getDocs, limit, orderBy, query, startAfter, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '../../api/firebase-config';
+import { findObjectById } from '../../utils/array';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function ProductsPage() {
@@ -13,6 +15,8 @@ export default function ProductsPage() {
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
   const [noMore, setNoMore] = useState(false);
+
+    const navigate = useNavigate()
 
 
   const fetchProducts = async (loadMore = false) => {
@@ -60,6 +64,12 @@ export default function ProductsPage() {
     setLoading(false);
   }
 
+  const handleProductSelected = async (idProductClicked: string) => { 
+    const productClickedOn = await findObjectById(idProductClicked, products);
+    navigate(`${idProductClicked}`)
+    // console.log(productClickedOn)
+   }
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -79,7 +89,7 @@ export default function ProductsPage() {
           {products.map((product) => (
             <div key={product.id}>
               {/* {product.productName  ?? "Sans nom"} */}
-              <Card title={product.productName} />
+              <Card title={product.id} onClick={() => handleProductSelected(product.id)} />
             </div>
           ))}
         </div>
