@@ -10,7 +10,8 @@ export const getProduct = async (idProduct: string) => {
 
     if (docSnapshot.exists()) {
         const productReceived = docSnapshot.data()
-        console.log("productReceived: ", productReceived)
+        //console.log("productReceived: ", productReceived)
+        return productReceived
     }
 }
 
@@ -21,7 +22,6 @@ export const addProduct = async () => {
 
     // DATA
     const data = {
-        id: crypto.randomUUID(),
         imageSource: "https://crazee-burger-seven.vercel.app/images/logo-orange.png",
         productName: "produit",
         price: 5.90,
@@ -42,4 +42,16 @@ export const addProduct = async () => {
     catch (err: any) {
         console.log("error: ", err)
     }
+}
+
+export const findDocById = async (collectionName: string, docId: string) => {
+    const docRef = doc(db, collectionName, docId);
+    const docSnap = await getDoc(docRef);
+
+    if (!docSnap.exists()) {
+        console.log("Aucun document trouvé avec cet ID");
+        return null;
+    }
+
+    return { id: docSnap.id, ...docSnap.data() };
 }

@@ -3,7 +3,6 @@ import PageLayout from '../layouts/PageLayout';
 import Card from '../reusable-ui/card/Card';
 import { collection, getDocs, limit, orderBy, query, startAfter, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '../../api/firebase-config';
-import { findObjectById } from '../../utils/array';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -16,7 +15,7 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(false);
   const [noMore, setNoMore] = useState(false);
 
-    const navigate = useNavigate()
+  const navigate = useNavigate()
 
 
   const fetchProducts = async (loadMore = false) => {
@@ -51,6 +50,7 @@ export default function ProductsPage() {
 
         setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
 
+
         if (snapshot.docs.length < 20) {
           setNoMore(true);
         }
@@ -64,11 +64,12 @@ export default function ProductsPage() {
     setLoading(false);
   }
 
-  const handleProductSelected = async (idProductClicked: string) => { 
-    const productClickedOn = await findObjectById(idProductClicked, products);
+  const handleProductSelected = async (idProductClicked: string) => {
+    if(idProductClicked === undefined) {
+      return;
+    }
     navigate(`${idProductClicked}`)
-    // console.log(productClickedOn)
-   }
+  }
 
   useEffect(() => {
     fetchProducts();
@@ -95,17 +96,17 @@ export default function ProductsPage() {
         </div>
 
         {/* Bouton "Voir plus" */}
-          {!noMore && (
-            <div className="flex justify-center pt-6">
-              <button
-                onClick={() => fetchProducts(true)}
-                disabled={loading}
-                className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition disabled:opacity-50 cursor-pointer"
-              >
-                {loading ? "Chargement..." : "Voir plus"}
-              </button>
-            </div>
-          )}
+        {!noMore && (
+          <div className="flex justify-center pt-6">
+            <button
+              onClick={() => fetchProducts(true)}
+              disabled={loading}
+              className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition disabled:opacity-50 cursor-pointer"
+            >
+              {loading ? "Chargement..." : "Voir plus"}
+            </button>
+          </div>
+        )}
 
         {/* Message si plus de données */}
         {noMore && (
@@ -115,12 +116,3 @@ export default function ProductsPage() {
     </PageLayout>
   )
 }
-
-
-// <button onClick={handleAddProduct}>Ajouter un produit</button>
-
-
-// const [menu, setMenu] = useState<ProductType2[]>(DEFAULT_GENERATED_MENU)
-
-// appel API pour récupérer le produit "81dQsvr9XA0bfJvQjPu0" => Burger Smoke BBQ"
-// getProduct("81dQsvr9XA0bfJvQjPu0")
