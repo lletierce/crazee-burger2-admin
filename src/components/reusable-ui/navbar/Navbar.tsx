@@ -4,7 +4,16 @@ import LogoText from '../logo/LogoText'
 
 export default function Navbar() {
     return (
-        <nav className='relative'>
+        <nav>
+            <div className='flex md:hidden bg-red-500 h-[8vh] min-h-[64px] w-full fixed top-0 z-10'>NavbarMobile</div>
+            <div className='hidden md:flex bg-blue-500 h-[10vh] px-6'>NavbarDesktop</div>
+        </nav>
+    )
+}
+
+
+/*
+<nav className='relative'>
             <div className="bg-yellow-400 md:hidden h-[8vh] min-h-[64px] w-full flex flex-row items-center justify-between fixed top-0 right-0 left-0 z-50">
                 <div className="pl-3 flex items-center h-full text-3xl">
                     <MdMenu />
@@ -31,5 +40,4 @@ export default function Navbar() {
                 <div className='bg-red-400 flex justify-end items-center w-1/4'>profile</div>
             </div>
         </nav>
-    )
-}
+*/

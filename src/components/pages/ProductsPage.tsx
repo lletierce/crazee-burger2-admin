@@ -79,7 +79,8 @@ export default function ProductsPage() {
   // affichage
   return (
     <PageLayout>
-      <div className="w-full p-4 flex flex-col gap-6 md:h-[85vh] md:pr-0 md:overflow-y-scroll md:overflow-hidden">
+      {/* <div className="w-full p-4 flex flex-col gap-6 md:h-[85vh] md:pr-0 md:overflow-y-scroll md:overflow-hidden"> */}
+      <div className="w-full p-4 flex flex-col gap-6 md:h-[85vh] md:pr-0 md:overflow-y-scroll overflow-hidden">
         {/* Grille responsive */}
         <div className="
           grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] 

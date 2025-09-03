@@ -16,23 +16,31 @@ export default function ProductPage() {
 
 
   const debug = async () => {
-    if(productId === undefined) {return;}
+    if (productId === undefined) { return; }
     const pdt = await findDocById("products", productId)
     console.log("pdt: ", pdt);
   }
 
   useEffect(() => {
-    debug()
+    // debug()
   }, [])
 
 
   return (
     <PageLayout>
-      <div>
-        <h2>Ceci est : {productId}</h2>
-        <h3>{product.productName}</h3>
-        <button className="cursor-pointer" onClick={() => navigate(`../`)}>return</button>
+      <div className="bg-purple-400 h-full md:mx-6 md:h-[85vh] mt-5">
+        <div className="bg-blue-500 md:h-[5vh] h-[60px] flex items-center">toolbar</div>
+        <div className="bg-blue-700 md:h-[80vh] h-100">
+          <div>description</div>
+          <div>image</div>
+        </div>
       </div>
     </PageLayout>
   )
 }
+
+/*
+<h2>Ceci est : {productId}</h2>
+<h3>{product.productName}</h3>
+<button className="cursor-pointer" onClick={() => navigate(`../`)}>return</button>
+*/
