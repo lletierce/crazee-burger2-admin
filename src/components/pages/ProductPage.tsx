@@ -3,12 +3,12 @@ import PageLayout from "../layouts/PageLayout"
 import { useEffect, useState } from "react";
 import type { DocumentData } from "firebase/firestore";
 import { findDocById } from "../../api/menuService";
-import { EMPTY_PRODUCT } from "../../enums/product";
+import { EMPTY_PRODUCT, SAMPLE_PRODUCTS } from "../../enums/product";
 
 
 export default function ProductPage() {
 
-  const [product, setProduct] = useState<DocumentData>(EMPTY_PRODUCT)
+  const [product, setProduct] = useState<DocumentData>(SAMPLE_PRODUCTS[0])
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
   // const params  = useParams();
@@ -17,22 +17,23 @@ export default function ProductPage() {
 
   const debug = async () => {
     if (productId === undefined) { return; }
-    const pdt = await findDocById("products", productId)
-    console.log("pdt: ", pdt);
+    // const pdt = await findDocById("products", productId)
+    // console.log("pdt: ", pdt);
+    console.log(product)
   }
 
   useEffect(() => {
-    // debug()
+    debug()
   }, [])
 
 
   return (
     <PageLayout>
-      <div className="bg-purple-400 h-full md:mx-6 md:h-[85vh] mt-5">
-        <div className="bg-blue-500 md:h-[5vh] h-[60px] flex items-center">toolbar</div>
-        <div className="bg-blue-700 md:h-[80vh] h-100">
-          <div>description</div>
-          <div>image</div>
+      <div className="bg-purple-400 md:h-[85vh] h-full px-4">
+        <div className="bg-yellow-400 h-[5vh] min-h-[60px] flex items-center">toolbar</div>
+        <div className="bg-blue-700 md:h-[80vh] flex flex-col md:flex-row">
+          <div className="bg-orange-400 flex-1/2">description</div>
+          <div className="bg-yellow-700 flex-1/2">image</div>
         </div>
       </div>
     </PageLayout>
