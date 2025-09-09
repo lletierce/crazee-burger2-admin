@@ -1,14 +1,28 @@
 import { useNavigate, useParams } from "react-router-dom"
 import PageLayout from "../layouts/PageLayout"
 import { useEffect, useState } from "react";
-import type { DocumentData } from "firebase/firestore";
+import type { DocumentData, Timestamp } from "firebase/firestore";
+import { EMPTY_PRODUCT, IMAGE_NOT_AVAILABLE, SAMPLE_PRODUCTS } from "../../enums/product";
+import ImagePreview from "../reusable-ui/ImagePreview";
 import { findDocById } from "../../api/menuService";
-import { EMPTY_PRODUCT, SAMPLE_PRODUCTS } from "../../enums/product";
 
+
+type Product = {
+  productName: string,
+  price: number,
+  imageSource: string,
+  quantity: number,
+  isAvailable: boolean,
+  isPromoted: boolean,
+  createdAt: Timestamp,
+  lastUpdate: Timestamp,
+  productType: string,
+}
 
 export default function ProductPage() {
 
-  const [product, setProduct] = useState<DocumentData>(SAMPLE_PRODUCTS[0])
+  // const [product, setProduct] = useState<DocumentData>(SAMPLE_PRODUCTS[0])
+  const [product, setProduct] = useState<(Product & { id: string }) | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
   // const params  = useParams();
@@ -17,23 +31,47 @@ export default function ProductPage() {
 
   const debug = async () => {
     if (productId === undefined) { return; }
-    // const pdt = await findDocById("products", productId)
-    // console.log("pdt: ", pdt);
-    console.log(product)
+    const pdt = await findDocById("products", productId)
+    // setProduct(pdt)
+    console.log("pdt: ", pdt);
+
   }
 
   useEffect(() => {
-    debug()
-  }, [])
+    if (!productId) { return; }
 
+    const fetchProduct = async () => {
+      const data = await findDocById<Product>("products", productId);
+      setProduct(data);
+    };
+
+    fetchProduct();
+    // console.log(product)
+  }, [productId]);
+
+  if (!product) return <p>Chargement...</p>;
 
   return (
     <PageLayout>
-      <div className="bg-purple-400 md:h-[85vh] h-full px-4">
-        <div className="bg-yellow-400 h-[5vh] min-h-[60px] flex items-center">toolbar</div>
-        <div className="bg-blue-700 md:h-[80vh] flex flex-col md:flex-row">
-          <div className="bg-orange-400 flex-1/2">description</div>
-          <div className="bg-yellow-700 flex-1/2">image</div>
+      <div className="bg-purple-400 h-full md:h-[85vh] md:px-4">
+        <div className="bg-yellow-400 h-[10vh] max-h-[60px] flex items-center">toolbar</div>
+        <div className="bg-green-700 flex flex-1 flex-col-reverse md:flex-row overflow-hidden">
+          <div className="bg-orange-400 flex-1">
+            <h2>{product.productName}</h2>
+            <p>prix: {product.price}</p>
+            <p>quantité: {product.quantity}</p>
+            <p>imageSource: {product.imageSource}</p>
+            <p>isAvailable: {product.isAvailable ? "oui" : "non"}</p>
+            <p>isPromoted: {product.isPromoted ? "oui" : "non"}</p>
+            <p>productType: {product.productType}</p>
+            
+            <p>createdAt: {product.createdAt.toDate().toLocaleDateString()}</p>
+            <p>lastUpdate: {product.createdAt.toDate().toLocaleDateString()}</p>
+
+          </div>
+          <ImagePreview
+            imageURL={product.imageSource ? product.imageSource : IMAGE_NOT_AVAILABLE}
+          />
         </div>
       </div>
     </PageLayout>

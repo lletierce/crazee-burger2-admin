@@ -44,14 +44,29 @@ export const addProduct = async () => {
     }
 }
 
-export const findDocById = async (collectionName: string, docId: string) => {
-    const docRef = doc(db, collectionName, docId);
-    const docSnap = await getDoc(docRef);
+// export const findDocById = async (collectionName: string, docId: string) => {
+//     const docRef = doc(db, collectionName, docId);
+//     const docSnap = await getDoc(docRef);
 
-    if (!docSnap.exists()) {
-        console.log("Aucun document trouvé avec cet ID");
-        return null;
-    }
+//     if (!docSnap.exists()) {
+//         console.log("Aucun document trouvé avec cet ID");
+//         return null;
+//     }
 
-    return { id: docSnap.id, ...docSnap.data() };
-}
+//     return { id: docSnap.id, ...docSnap.data() };
+// }
+
+export const findDocById = async <T = any>(
+  collectionName: string,
+  docId: string
+): Promise<(T & { id: string }) | null> => {
+  const docRef = doc(db, collectionName, docId);
+  const docSnap = await getDoc(docRef);
+
+  if (!docSnap.exists()) {
+    console.log("Aucun document trouvé");
+    return null;
+  }
+
+  return { id: docSnap.id, ...docSnap.data() } as T & { id: string };
+};
