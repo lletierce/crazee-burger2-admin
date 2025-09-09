@@ -11,8 +11,8 @@ import { useApp } from '../../context/AppContext';
 export default function ProductsPage() {
 
   // state
-  // const [products, setProducts] = useState<DocumentData[]>([]);
-  const [products, setProducts] = useState(SAMPLE_PRODUCTS);
+  const [products, setProducts] = useState<DocumentData[]>([]);
+  // const [products, setProducts] = useState(SAMPLE_PRODUCTS);
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
   const [noMore, setNoMore] = useState(false);
@@ -82,7 +82,7 @@ export default function ProductsPage() {
    }
 
   useEffect(() => {
-    // fetchProducts();
+    fetchProducts();
   }, []);
 
 
