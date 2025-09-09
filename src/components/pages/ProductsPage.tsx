@@ -5,18 +5,22 @@ import { collection, getDocs, limit, orderBy, query, startAfter, type DocumentDa
 import { db } from '../../api/firebase-config';
 import { useNavigate } from 'react-router-dom';
 import { SAMPLE_PRODUCTS } from '../../enums/product';
+import { useApp } from '../../context/AppContext';
 
 
 export default function ProductsPage() {
 
   // state
-  const [products, setProducts] = useState<DocumentData[]>([]);
-  // const [products, setProducts] = useState(SAMPLE_PRODUCTS);
+  // const [products, setProducts] = useState<DocumentData[]>([]);
+  const [products, setProducts] = useState(SAMPLE_PRODUCTS);
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
   const [noMore, setNoMore] = useState(false);
 
   const navigate = useNavigate()
+
+  const { setIsLateralLeftPanelOpen } = useApp();
+  
 
 
   const fetchProducts = async (loadMore = false) => {
@@ -66,22 +70,32 @@ export default function ProductsPage() {
   }
 
   const handleProductSelected = async (idProductClicked: string) => {
-    if(idProductClicked === undefined) {
+    if (idProductClicked === undefined) {
       return;
     }
     navigate(`${idProductClicked}`)
   }
 
+  const handleClickAddBtn = () => { 
+    setIsLateralLeftPanelOpen(true)
+    // console.log("handleClickAddBtn")
+   }
+
   useEffect(() => {
-    fetchProducts();
+    // fetchProducts();
   }, []);
+
 
 
   // affichage
   return (
     <PageLayout>
+      <div className="bg-yellow-400 h-[10vh] max-h-[60px] flex items-center flex-row-reverse pr-4">
+        <button onClick={handleClickAddBtn} className='cursor-pointer'>+Ajouter</button>
+      </div>
+
       {/* <div className="w-full p-4 flex flex-col gap-6 md:h-[85vh] md:pr-0 md:overflow-y-scroll md:overflow-hidden"> */}
-      <div className="w-full p-4 flex flex-col gap-6 md:h-[85vh] md:pr-0 md:overflow-y-scroll overflow-hidden">
+      <div className="w-full p-4 flex flex-col gap-6 md:h-[81vh] md:pr-0 md:overflow-y-scroll overflow-hidden">
         {/* Grille responsive */}
         <div className="
           grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] 
