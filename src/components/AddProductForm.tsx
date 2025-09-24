@@ -1,6 +1,7 @@
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { useState, type FormEvent } from "react";
 import { db } from "../api/firebase-config";
+import { toast, ToastContainer } from "react-toastify";
 
 type Product = {
   productName: string;
@@ -83,7 +84,16 @@ export default function AddProductForm() {
     try{
       await addDoc(collection(db, "products"), productToAdd);
       
-      console.log("Produit ajouté avec succès !");
+      toast.success("Produit ajouté avec succès", {
+        theme: "dark",
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
       // reset du formulaire
       setProduct({
         productName: "",
@@ -97,6 +107,16 @@ export default function AddProductForm() {
     }
     catch(err){
       console.error("Erreur lors de l'ajout :", err);
+      toast.error("Erreur lors de l'ajout", {
+        theme: "dark",
+        position: "top-right",
+        autoClose: 4000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      })
     }
    
     console.log(product)
@@ -211,6 +231,7 @@ export default function AddProductForm() {
           </div>
         </div>
       </form>
+      <ToastContainer />
     </div>
   )
 }
