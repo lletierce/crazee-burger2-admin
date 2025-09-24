@@ -1,7 +1,8 @@
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { useState, type FormEvent } from "react";
 import { db } from "../api/firebase-config";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
+import { ADD_PRODUCT_FAIL_MESSAGE, ADD_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS } from "../enums/toast";
 
 type Product = {
   productName: string;
@@ -84,16 +85,8 @@ export default function AddProductForm() {
     try{
       await addDoc(collection(db, "products"), productToAdd);
       
-      toast.success("Produit ajouté avec succès", {
-        theme: "dark",
-        position: "top-right",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      })
+      toast.success(ADD_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS)
+      
       // reset du formulaire
       setProduct({
         productName: "",
@@ -106,20 +99,10 @@ export default function AddProductForm() {
       });
     }
     catch(err){
-      console.error("Erreur lors de l'ajout :", err);
-      toast.error("Erreur lors de l'ajout", {
-        theme: "dark",
-        position: "top-right",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      })
+      toast.error(ADD_PRODUCT_FAIL_MESSAGE, DEFAULT_TOAST_OPTIONS)
     }
    
-    console.log(product)
+    // console.log(product)
   }
 
   return (
@@ -231,7 +214,6 @@ export default function AddProductForm() {
           </div>
         </div>
       </form>
-      <ToastContainer />
     </div>
   )
 }

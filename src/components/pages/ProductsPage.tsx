@@ -6,6 +6,7 @@ import { db } from '../../api/firebase-config';
 import { useNavigate } from 'react-router-dom';
 import { SAMPLE_PRODUCTS } from '../../enums/product';
 import { useApp } from '../../context/AppContext';
+import { ToastContainer } from 'react-toastify';
 
 
 export default function ProductsPage() {
@@ -129,6 +130,7 @@ export default function ProductsPage() {
           <p className="text-center text-gray-500">Tous les produits sont affichés</p>
         )}
       </div>
+      <ToastContainer />
     </PageLayout>
   )
 }
