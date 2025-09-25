@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import PageLayout from '../layouts/PageLayout';
 import Card from '../reusable-ui/card/Card';
-import { collection, getDocs, limit, orderBy, query, startAfter, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, deleteDoc, doc, getDocs, limit, orderBy, query, startAfter, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '../../api/firebase-config';
 import { useNavigate } from 'react-router-dom';
-import { SAMPLE_PRODUCTS } from '../../enums/product';
 import { useApp } from '../../context/AppContext';
-import { ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
+import ConfirmDialog from '../reusable-ui/ConfirmDialog';
+import { DEFAULT_TOAST_OPTIONS, DELETE_PRODUCT_FAIL_MESSAGE, DELETE_PRODUCT_SUCCESS_MESSAGE } from '../../enums/toast';
 
 
 export default function ProductsPage() {
@@ -18,10 +19,13 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(false);
   const [noMore, setNoMore] = useState(false);
 
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+
   const navigate = useNavigate()
 
   const { setIsLateralLeftPanelOpen } = useApp();
-  
+
 
 
   const fetchProducts = async (loadMore = false) => {
@@ -77,10 +81,22 @@ export default function ProductsPage() {
     navigate(`${idProductClicked}`)
   }
 
-  const handleClickAddBtn = () => { 
+  const handleClickAddBtn = () => {
     setIsLateralLeftPanelOpen(true)
     // console.log("handleClickAddBtn")
-   }
+  }
+
+  const handleDelete  = async (id: string) => { 
+    try {
+        await deleteDoc(doc(db, "products", id));
+        toast.success(DELETE_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS)
+        fetchProducts()
+      }
+      catch (error) {
+        toast.error(DELETE_PRODUCT_FAIL_MESSAGE, DEFAULT_TOAST_OPTIONS)
+        console.error("Erreur lors de la suppression :", error);
+      }
+     }
 
   useEffect(() => {
     fetchProducts();
@@ -107,7 +123,14 @@ export default function ProductsPage() {
           {products.map((product) => (
             <div key={product.id}>
               {/* {product.productName  ?? "Sans nom"} */}
-              <Card title={product.id} onClick={() => handleProductSelected(product.id)} />
+              <Card
+                title={product.id}
+                onClick={() => handleProductSelected(product.id)}
+                onDelete={() => {
+                  setSelectedProductId(product.id);
+                  setIsDialogOpen(true);
+                }}
+              />
             </div>
           ))}
         </div>
@@ -130,6 +153,12 @@ export default function ProductsPage() {
           <p className="text-center text-gray-500">Tous les produits sont affichés</p>
         )}
       </div>
+      <ConfirmDialog
+              isOpen={isDialogOpen}
+              onClose={() => setIsDialogOpen(false)}
+              onConfirm={() => selectedProductId && handleDelete(selectedProductId)}
+              message="Êtes-vous sûr de vouloir supprimer ce produit ?"
+            />
       <ToastContainer />
     </PageLayout>
   )
