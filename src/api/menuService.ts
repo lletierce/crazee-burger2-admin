@@ -1,7 +1,10 @@
-import { collection, doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore"
+import { collection, deleteDoc, doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore"
 import { db } from "./firebase-config"
 
-
+export const deleteProduct = async (id: string) => {
+    await deleteDoc(doc(db, "products", id));
+    // additional instructions possible here if needed
+}
 
 export const getProduct = async (idProduct: string) => {
     // docRef = doc(PATH) => db\products\81dQsvr9X..

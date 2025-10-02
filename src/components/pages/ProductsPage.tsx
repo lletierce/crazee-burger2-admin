@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import PageLayout from '../layouts/PageLayout';
 import Card from '../reusable-ui/card/Card';
-import { collection, deleteDoc, doc, getDocs, limit, orderBy, query, startAfter, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, getDocs, limit, orderBy, query, startAfter, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '../../api/firebase-config';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { toast, ToastContainer } from 'react-toastify';
 import ConfirmDialog from '../reusable-ui/ConfirmDialog';
 import { DEFAULT_TOAST_OPTIONS, DELETE_PRODUCT_FAIL_MESSAGE, DELETE_PRODUCT_SUCCESS_MESSAGE } from '../../enums/toast';
+import { deleteProduct } from '../../api/menuService';
 
 
 export default function ProductsPage() {
@@ -86,17 +87,17 @@ export default function ProductsPage() {
     // console.log("handleClickAddBtn")
   }
 
-  const handleDelete  = async (id: string) => { 
+  const handleDelete = async (id: string) => {
     try {
-        await deleteDoc(doc(db, "products", id));
-        toast.success(DELETE_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS)
-        fetchProducts()
-      }
-      catch (error) {
-        toast.error(DELETE_PRODUCT_FAIL_MESSAGE, DEFAULT_TOAST_OPTIONS)
-        console.error("Erreur lors de la suppression :", error);
-      }
-     }
+      deleteProduct(id)
+      toast.success(DELETE_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS)
+      fetchProducts()
+    }
+    catch (error) {
+      toast.error(DELETE_PRODUCT_FAIL_MESSAGE, DEFAULT_TOAST_OPTIONS)
+      //console.error("Erreur lors de la suppression :", error);
+    }
+  }
 
   useEffect(() => {
     fetchProducts();
@@ -154,11 +155,11 @@ export default function ProductsPage() {
         )}
       </div>
       <ConfirmDialog
-              isOpen={isDialogOpen}
-              onClose={() => setIsDialogOpen(false)}
-              onConfirm={() => selectedProductId && handleDelete(selectedProductId)}
-              message="Êtes-vous sûr de vouloir supprimer ce produit ?"
-            />
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onConfirm={() => selectedProductId && handleDelete(selectedProductId)}
+        message="Êtes-vous sûr de vouloir supprimer ce produit ?"
+      />
       <ToastContainer />
     </PageLayout>
   )

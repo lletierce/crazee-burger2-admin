@@ -1,11 +1,10 @@
 import { useNavigate, useParams } from "react-router-dom"
 import PageLayout from "../layouts/PageLayout"
 import { useEffect, useState } from "react";
-import { deleteDoc, doc, type Timestamp } from "firebase/firestore";
+import { type Timestamp } from "firebase/firestore";
 import { IMAGE_NOT_AVAILABLE } from "../../enums/product";
 import ImagePreview from "../reusable-ui/ImagePreview";
-import { findDocById } from "../../api/menuService";
-import { db } from "../../api/firebase-config";
+import { deleteProduct, findDocById } from "../../api/menuService";
 import ConfirmDialog from "../reusable-ui/ConfirmDialog";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS, DELETE_PRODUCT_FAIL_MESSAGE, DELETE_PRODUCT_SUCCESS_MESSAGE } from "../../enums/toast";
@@ -39,23 +38,19 @@ export default function ProductPage() {
   const handleClickOnProducts = () => {
     navigate(`../`)
     //console.log("handleClickOnProducts")
-   }
+  }
 
-  const handleClickOnDeleteButton = () => { 
-    console.log("handleClickOnDeleteButton")
-    }
-
-  const handleDelete  = async (id: string) => { 
+  const handleDelete = async (id: string) => {
     try {
-      await deleteDoc(doc(db, "products", id));
+      deleteProduct(id)
       toast.success(DELETE_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS)
       navigate(`../`)
     }
     catch (error) {
       toast.error(DELETE_PRODUCT_FAIL_MESSAGE, DEFAULT_TOAST_OPTIONS)
-      console.error("Erreur lors de la suppression :", error);
+      //console.error("Erreur lors de la suppression :", error);
     }
-   }
+  }
 
 
   useEffect(() => {
@@ -82,14 +77,14 @@ export default function ProductPage() {
             <li>{"> "}<span>{product.productType}</span></li>
             <li>{"> "}<span>{product.productName}</span></li>
           </ul>
-          <button 
-            className="cursor-pointer hover:bg-red-900" 
-            onClick={() =>{
+          <button
+            className="cursor-pointer hover:bg-red-900"
+            onClick={() => {
               setSelectedProductId(product.id);
               setIsDialogOpen(true);
             }}
-            > 
-              Delete
+          >
+            Delete
           </button>
         </div>
         <div className="bg-green-700 flex flex-1 flex-col-reverse md:flex-row overflow-hidden">
@@ -101,7 +96,7 @@ export default function ProductPage() {
             <p>isAvailable: {product.isAvailable ? "oui" : "non"}</p>
             <p>isPromoted: {product.isPromoted ? "oui" : "non"}</p>
             <p>productType: {product.productType}</p>
-            
+
             <p>createdAt: {product.createdAt.toDate().toLocaleDateString()}</p>
             <p>lastUpdate: {product.createdAt.toDate().toLocaleDateString()}</p>
           </div>
