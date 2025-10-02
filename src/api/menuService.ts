@@ -1,5 +1,6 @@
-import { collection, deleteDoc, doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc } from "firebase/firestore"
 import { db } from "./firebase-config"
+import type { ProductType } from "../enums/product";
 
 export const deleteProduct = async (id: string) => {
     await deleteDoc(doc(db, "products", id));
@@ -18,46 +19,12 @@ export const getProduct = async (idProduct: string) => {
     }
 }
 
-export const addProduct = async () => {
 
-    // PATH
-    const newDocRef = doc(collection(db, "products"));
-
-    // DATA
-    const data = {
-        imageSource: "https://crazee-burger-seven.vercel.app/images/logo-orange.png",
-        productName: "produit",
-        price: 5.90,
-        quantity: 100,
-        isAvailable: true,
-        isPromoted: false,
-        productType: "Burger",
-        createdAt: serverTimestamp(),
-        lastUpdate: serverTimestamp(),
-    }
-
-    try {
-        // SetDoc(PATH, DATA)
-        await setDoc(newDocRef, data)
-        // console.log("Produit ajouté avec ID :", newDocRef.id);
-
-    }
-    catch (err: any) {
-        console.log("error: ", err)
-    }
+export const addProduct = async (productToAdd: ProductType) => {
+  await addDoc(collection(db, "products"), productToAdd);
 }
 
-// export const findDocById = async (collectionName: string, docId: string) => {
-//     const docRef = doc(db, collectionName, docId);
-//     const docSnap = await getDoc(docRef);
 
-//     if (!docSnap.exists()) {
-//         console.log("Aucun document trouvé avec cet ID");
-//         return null;
-//     }
-
-//     return { id: docSnap.id, ...docSnap.data() };
-// }
 
 export const findDocById = async <T = any>(
   collectionName: string,

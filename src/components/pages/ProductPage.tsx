@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import PageLayout from "../layouts/PageLayout"
 import { useEffect, useState } from "react";
 import { type Timestamp } from "firebase/firestore";
-import { IMAGE_NOT_AVAILABLE } from "../../enums/product";
+import { IMAGE_NOT_AVAILABLE, type ProductType } from "../../enums/product";
 import ImagePreview from "../reusable-ui/ImagePreview";
 import { deleteProduct, findDocById } from "../../api/menuService";
 import ConfirmDialog from "../reusable-ui/ConfirmDialog";
@@ -10,22 +10,10 @@ import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS, DELETE_PRODUCT_FAIL_MESSAGE, DELETE_PRODUCT_SUCCESS_MESSAGE } from "../../enums/toast";
 
 
-type Product = {
-  productName: string,
-  price: number,
-  imageSource: string,
-  quantity: number,
-  isAvailable: boolean,
-  isPromoted: boolean,
-  createdAt: Timestamp,
-  lastUpdate: Timestamp,
-  productType: string,
-}
-
 export default function ProductPage() {
 
   // const [product, setProduct] = useState<DocumentData>(SAMPLE_PRODUCTS[0])
-  const [product, setProduct] = useState<(Product & { id: string }) | null>(null);
+  const [product, setProduct] = useState<(ProductType & { id: string }) | null>(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
   // const params  = useParams();
@@ -57,7 +45,7 @@ export default function ProductPage() {
     if (!productId) { return; }
 
     const fetchProduct = async () => {
-      const data = await findDocById<Product>("products", productId);
+      const data = await findDocById<ProductType>("products", productId);
       setProduct(data);
     };
 

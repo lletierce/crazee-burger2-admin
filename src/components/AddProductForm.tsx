@@ -1,36 +1,19 @@
-import { addDoc, collection, Timestamp } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 import { useState, type FormEvent } from "react";
-import { db } from "../api/firebase-config";
 import { toast } from "react-toastify";
 import { ADD_PRODUCT_FAIL_MESSAGE, ADD_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS } from "../enums/toast";
+import { addProduct } from "../api/menuService";
+import { EMPTY_PRODUCT, type ProductType } from "../enums/product";
 
-type Product = {
-  productName: string;
-  price: number;
-  imageSource: string;
-  quantity: number;
-  isAvailable: boolean;
-  isPromoted: boolean;
-  createdAt: Timestamp;
-  lastUpdate: Timestamp;
-  productType: string;
-};
+
 export default function AddProductForm() {
 
   // Omit<T, K> -> prends le type T, mais enlève les propriétés K
-  const [product, setProduct] = useState<Omit<Product, "createdAt" | "lastUpdate">>({
-    productName: "",
-    price: 0,
-    imageSource: "",
-    quantity: 0,
-    isAvailable: false,
-    isPromoted: false,
-    productType: "",
-  });
+  const [product, setProduct] = useState<Omit<ProductType, "createdAt" | "lastUpdate">>(EMPTY_PRODUCT);
 
-  const [errors, setErrors] = useState<Partial<Record<keyof Product, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof ProductType, string>>>({});
 
-  
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
 
@@ -42,7 +25,7 @@ export default function AddProductForm() {
   }
 
   const validate = () => {
-    const newErrors: Partial<Record<keyof Product, string>> = {};
+    const newErrors: Partial<Record<keyof ProductType, string>> = {};
 
     if (!product.productName.trim()) {
       newErrors.productName = "Le nom du produit est requis";
@@ -63,6 +46,9 @@ export default function AddProductForm() {
     return newErrors;
   }
 
+  const resetForm = () => {
+    setProduct(EMPTY_PRODUCT);
+  }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -75,33 +61,22 @@ export default function AddProductForm() {
 
     setErrors({}); // clean les erreurs si tout va bien
 
-     const now = new Date();
-      const productToAdd: Product = {
+    const now = new Date();
+    const productToAdd: ProductType = {
       ...product,
       createdAt: Timestamp.fromDate(now),
       lastUpdate: Timestamp.fromDate(now),
     };
 
-    try{
-      await addDoc(collection(db, "products"), productToAdd);
-      
+    try {
+      addProduct(productToAdd)
       toast.success(ADD_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS)
-      
-      // reset du formulaire
-      setProduct({
-        productName: "",
-        price: 0,
-        imageSource: "",
-        quantity: 0,
-        isAvailable: false,
-        isPromoted: false,
-        productType: "",
-      });
+      resetForm()
     }
-    catch(err){
+    catch (err) {
       toast.error(ADD_PRODUCT_FAIL_MESSAGE, DEFAULT_TOAST_OPTIONS)
     }
-   
+
     // console.log(product)
   }
 
@@ -190,7 +165,7 @@ export default function AddProductForm() {
               )}
             </div>
             <div className="[grid-area:5/1/6/2] bg-purple-400 text-xl  w-full">
-            <select
+              <select
                 name="isPromoted"
                 value={product.isPromoted ? "true" : "false"}
                 onChange={(e) =>
@@ -207,7 +182,7 @@ export default function AddProductForm() {
             </div>
           </div>
           <div className="[grid-area:1/2/-2/3] bg-gray-400">
-                {product.imageSource ? (<img src={product.imageSource} alt={"image-preview"} />) : (<div className="h-[300px] w-[300px] flex items-center justify-center border border-amber-300">Aucune Image</div>)}
+            {product.imageSource ? (<img src={product.imageSource} alt={"image-preview"} />) : (<div className="h-[300px] w-[300px] flex items-center justify-center border border-amber-300">Aucune Image</div>)}
           </div>
           <div className="[grid-area:5/1/-2/3]  flex items-center justify-end-safe">
             <button className="text-lg font-semibold cursor-pointer border-2 px-2" type="submit">Ajouter</button>
