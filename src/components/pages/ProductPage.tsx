@@ -1,7 +1,6 @@
 import { useNavigate, useParams } from "react-router-dom"
 import PageLayout from "../layouts/PageLayout"
 import { useEffect, useState } from "react";
-import { type Timestamp } from "firebase/firestore";
 import { IMAGE_NOT_AVAILABLE, type ProductType } from "../../enums/product";
 import ImagePreview from "../reusable-ui/ImagePreview";
 import { deleteProduct, findDocById } from "../../api/menuService";
@@ -62,8 +61,8 @@ export default function ProductPage() {
           {/* <span>{"Produits > Boissons > "} {product.productName}</span> */}
           <ul className="flex list-none gap-2">
             <li><span className="cursor-pointer hover:underline" onClick={handleClickOnProducts}>Produits</span></li>
-            <li>{"> "}<span>{product.productType}</span></li>
-            <li>{"> "}<span>{product.productName}</span></li>
+            <li>{"> "}<span className="capitalize">{product.productType}</span></li>
+            <li>{"> "}<span className="capitalize">{product.productName}</span></li>
           </ul>
           <button
             className="cursor-pointer hover:bg-red-900"
