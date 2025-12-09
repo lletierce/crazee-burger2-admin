@@ -2,6 +2,7 @@ import { Timestamp } from "firebase/firestore"
 
 
 export type ProductType = {
+  id: string;
   productName: string;
   price: number;
   imageSource: string;
@@ -16,6 +17,7 @@ export type ProductType = {
 export const IMAGE_NOT_AVAILABLE = "/images/img-not-available.jpg"
 
 export const EMPTY_PRODUCT = Object.freeze({
+  id: "",
   productName: "",
   price: 0,
   imageSource: "",
@@ -23,6 +25,8 @@ export const EMPTY_PRODUCT = Object.freeze({
   isAvailable: false,
   isPromoted: false,
   productType: "",
+  createdAt: Timestamp.now(),
+  lastUpdate: Timestamp.now(),
 })
 
 export const SAMPLE_PRODUCTS = [

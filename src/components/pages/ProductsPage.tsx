@@ -8,14 +8,17 @@ import { useApp } from '../../context/AppContext';
 import { toast, ToastContainer } from 'react-toastify';
 import ConfirmDialog from '../reusable-ui/ConfirmDialog';
 import { DEFAULT_TOAST_OPTIONS, DELETE_PRODUCT_FAIL_MESSAGE, DELETE_PRODUCT_SUCCESS_MESSAGE } from '../../enums/toast';
-import { deleteProduct } from '../../api/menuService';
+import { deleteProduct, findDocById, mapFirestoreProduct } from '../../api/menuService';
+import { useProduct } from '../../context/ProductContext';
+import type { ProductType } from '../../enums/product';
+import { slugify } from '../../utils/string';
 
 
 export default function ProductsPage() {
 
   // state
-  const [products, setProducts] = useState<DocumentData[]>([]);
-  // const [products, setProducts] = useState(SAMPLE_PRODUCTS);
+  const [products, setProducts] = useState<ProductType[]>([]);
+  
   const [lastDoc, setLastDoc] = useState<QueryDocumentSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
   const [noMore, setNoMore] = useState(false);
@@ -24,13 +27,17 @@ export default function ProductsPage() {
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
   const navigate = useNavigate()
+  const { setIdProductSelected } = useProduct();
+
 
   const { setIsLateralLeftPanelOpen } = useApp();
 
 
 
   const fetchProducts = async (loadMore = false) => {
+    
     setLoading(true);
+    
     try {
       let q;
 
@@ -51,21 +58,25 @@ export default function ProductsPage() {
       }
       const snapshot = await getDocs(q);
 
-      if (!snapshot.empty) {
-        const newProducts = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
+      // if (!snapshot.empty) {
+      //   const newProducts = snapshot.docs.map((doc) => ({
+      //     id: doc.id,
+      //     ...doc.data(),
+      //   }));
 
-        setProducts((prev) => (loadMore ? [...prev, ...newProducts] : newProducts));
+      if (!snapshot.empty) {
+        const menu = snapshot.docs.map(doc =>  
+          mapFirestoreProduct({ id: doc.id, ...doc.data() })
+        );
+        
+        setProducts(menu)
+        // setProducts((prev) => (loadMore ? [...prev, ...newProducts] : newProducts));
 
         setLastDoc(snapshot.docs[snapshot.docs.length - 1]);
 
-
-        if (snapshot.docs.length < 20) {
-          setNoMore(true);
-        }
-      } else {
+        if (snapshot.docs.length < 20) { setNoMore(true); }
+      } 
+      else {
         setNoMore(true);
       }
     }
@@ -75,16 +86,23 @@ export default function ProductsPage() {
     setLoading(false);
   }
 
-  const handleProductSelected = async (idProductClicked: string) => {
+  const handleProductSelected = async (idProductClicked: string, productName: string) => {
     if (idProductClicked === undefined) {
       return;
     }
-    navigate(`${idProductClicked}`)
+    // const data = await findDocById<ProductType>("products", idProductClicked);
+    // if(data != null){ setProductSelected(data) }
+    //navigate(`${idProductClicked}`)
+    
+    setIdProductSelected(idProductClicked)
+    navigate(`${slugify(productName)}`)
   }
 
   const handleClickAddBtn = () => {
     setIsLateralLeftPanelOpen(true)
-    // console.log("handleClickAddBtn")
+    
+    // DEBUG
+    // console.log(products[0])
   }
 
   const handleDelete = async (id: string) => {
@@ -126,7 +144,7 @@ export default function ProductsPage() {
               {/* {product.productName  ?? "Sans nom"} */}
               <Card
                 title={product.id}
-                onClick={() => handleProductSelected(product.id)}
+                onClick={() => handleProductSelected(product.id, product.productName)}
                 onDelete={() => {
                   setSelectedProductId(product.id);
                   setIsDialogOpen(true);

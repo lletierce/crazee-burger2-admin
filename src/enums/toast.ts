@@ -4,6 +4,9 @@ export const ADD_PRODUCT_FAIL_MESSAGE = "Erreur rencontrée, impossible d'ajoute
 export const DELETE_PRODUCT_SUCCESS_MESSAGE = "Produit supprimé avec succès"
 export const DELETE_PRODUCT_FAIL_MESSAGE = "Erreur rencontrée, impossible de supprimer le produit"
 
+export const EDIT_PRODUCT_SUCCESS_MESSAGE = "Produit modifié avec succès"
+export const EDIT_PRODUCT_FAIL_MESSAGE = "Erreur rencontrée, impossible de modifier le produit"
+
 export const DEFAULT_TOAST_OPTIONS = Object.freeze({
     theme: "dark",
     position: "top-right",

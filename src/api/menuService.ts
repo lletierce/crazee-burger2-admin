@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, Timestamp, type DocumentData } from "firebase/firestore"
 import { db } from "./firebase-config"
 import type { ProductType } from "../enums/product";
 
@@ -24,6 +24,18 @@ export const addProduct = async (productToAdd: ProductType) => {
   await addDoc(collection(db, "products"), productToAdd);
 }
 
+export const updateProduct = async ( idProduct: string, data: Partial<DocumentData>): Promise<void> => {  
+  
+  const docRef = doc(db, "products", idProduct);
+  
+  try {
+    await setDoc(docRef, data, { merge: true });
+    // console.log("Produit mis à jour (via setDoc + merge) !");
+  } catch (error) {
+    // console.error("Erreur lors de la mise à jour du produit :", error);
+    throw error;
+  }
+};
 
 
 export const findDocById = async <T = any>(
@@ -39,4 +51,19 @@ export const findDocById = async <T = any>(
   }
 
   return { id: docSnap.id, ...docSnap.data() } as T & { id: string };
+};
+
+export const mapFirestoreProduct = (doc: any): ProductType => {
+  return {
+    id: doc.id,
+    productName: doc.productName,
+    price: doc.price,
+    imageSource: doc.imageSource,
+    quantity: doc.quantity,
+    isAvailable: doc.isAvailable,
+    isPromoted: doc.isPromoted,
+    createdAt: doc.createdAt instanceof Timestamp ? doc.createdAt : null,
+    lastUpdate: doc.lastUpdate instanceof Timestamp ? doc.lastUpdate : null,
+    productType: doc.productType,
+  };
 };
