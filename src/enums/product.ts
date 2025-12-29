@@ -12,6 +12,7 @@ export type ProductType = {
   createdAt: Timestamp;
   lastUpdate: Timestamp;
   productType: string;
+  slug: string,
 };
 
 export const IMAGE_NOT_AVAILABLE = "/images/img-not-available.jpg"

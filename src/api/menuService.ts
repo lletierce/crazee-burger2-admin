@@ -1,4 +1,4 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, Timestamp, type DocumentData } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, Timestamp, where, type DocumentData } from "firebase/firestore"
 import { db } from "./firebase-config"
 import type { ProductType } from "../enums/product";
 
@@ -17,6 +17,21 @@ export const getProduct = async (idProduct: string) => {
         //console.log("productReceived: ", productReceived)
         return productReceived
     }
+}
+
+export const getProductBySlug = async (slug: string): Promise<ProductType | null> => {
+  const productsRef = collection(db, "products");    
+  
+  const q = query(productsRef, where("slug", "==", slug));
+  const snapshot = await getDocs(q);
+
+   if (snapshot.empty) {
+    console.log(`Aucun produit trouvé pour le slug : ${slug}`);
+    return null;
+  }
+
+  const doc = snapshot.docs[0];
+  return mapFirestoreProduct({ id: doc.id, ...doc.data() });
 }
 
 
@@ -38,6 +53,7 @@ export const updateProduct = async ( idProduct: string, data: Partial<DocumentDa
 };
 
 
+
 export const findDocById = async <T = any>(
   collectionName: string,
   docId: string
@@ -53,6 +69,7 @@ export const findDocById = async <T = any>(
   return { id: docSnap.id, ...docSnap.data() } as T & { id: string };
 };
 
+
 export const mapFirestoreProduct = (doc: any): ProductType => {
   return {
     id: doc.id,
@@ -65,5 +82,6 @@ export const mapFirestoreProduct = (doc: any): ProductType => {
     createdAt: doc.createdAt instanceof Timestamp ? doc.createdAt : null,
     lastUpdate: doc.lastUpdate instanceof Timestamp ? doc.lastUpdate : null,
     productType: doc.productType,
+    slug: doc.slug,
   };
 };

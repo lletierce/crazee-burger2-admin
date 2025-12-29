@@ -3,23 +3,22 @@ import PageLayout from "../layouts/PageLayout"
 import { useEffect, useState } from "react";
 import { IMAGE_NOT_AVAILABLE, type ProductType } from "../../enums/product";
 import ImagePreview from "../reusable-ui/ImagePreview";
-import { deleteProduct, findDocById } from "../../api/menuService";
+import { deleteProduct, getProductBySlug } from "../../api/menuService";
 import ConfirmDialog from "../reusable-ui/ConfirmDialog";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS, DELETE_PRODUCT_FAIL_MESSAGE, DELETE_PRODUCT_SUCCESS_MESSAGE } from "../../enums/toast";
 import EditProductForm from "../EditProductForm";
-import { useProduct } from "../../context/ProductContext";
 
 
 export default function ProductPage() {
 
-  const { idProductSelected } = useProduct();
   const [productSelected, setProductSelected] = useState<ProductType | null>(null);
   const [isEditable, setIsEditable] = useState(false)
-  //const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate()
-  // const params  = useParams();
-  // const { productId } = useParams(); // params.productId
+
+  // const { idProductSelected } = useProduct();
+  const { slug } = useParams(); // params.slug
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
@@ -27,7 +26,6 @@ export default function ProductPage() {
 
   const handleClickOnProducts = () => {
     navigate(`../`)
-    //console.log("handleClickOnProducts")
   }
 
   const handleDelete = async (id: string) => {
@@ -38,32 +36,43 @@ export default function ProductPage() {
     }
     catch (error) {
       toast.error(DELETE_PRODUCT_FAIL_MESSAGE, DEFAULT_TOAST_OPTIONS)
-      //console.error("Erreur lors de la suppression :", error);
     }
   }
 
 
   const handleEdit = () => {
-    setIsEditable(!isEditable)
-    // console.log(isEditable)
+    // setIsEditable(!isEditable)
+    console.log(isEditable)
+  }
+
+  const fetchProduct = async () => {
+
+    setLoading(true);
+
+    if (slug) {
+      try {
+        const data = await getProductBySlug(slug);
+
+        if (data !== null) {
+          setProductSelected(data)
+        }
+      }
+      catch (err) {
+        // console.error("Erreur de chargement Firestore :", err);
+        toast.error("GET_PRODUCT_FAIL_MESSAGE", DEFAULT_TOAST_OPTIONS)
+      }
+      setLoading(false);
+    }
   }
 
 
   useEffect(() => {
-    if (!idProductSelected) { return; }
-
-    const fetchProduct = async () => {
-      const data = await findDocById<ProductType>("products", idProductSelected);
-      setProductSelected(data);
-    };
-
     fetchProduct();
-    console.log("in useffect: ", productSelected)
-  }, [idProductSelected]);
-
-  if (!idProductSelected) return <p>Chargement...</p>;
+  }, []);
 
   if (!productSelected) return <p>Chargement...</p>;
+  
+  if (loading) return <p>Chargement...</p>;
 
 
   return (
@@ -126,9 +135,3 @@ export default function ProductPage() {
     </PageLayout>
   )
 }
-
-/*
-<h2>Ceci est : {productId}</h2>
-<h3>{productSelected.productName}</h3>
-<button className="cursor-pointer" onClick={() => navigate(`../`)}>return</button>
-*/
