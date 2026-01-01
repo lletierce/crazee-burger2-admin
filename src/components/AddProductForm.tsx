@@ -2,15 +2,17 @@ import { Timestamp } from "firebase/firestore";
 import { useState, type FormEvent } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { ADD_PRODUCT_FAIL_MESSAGE, ADD_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS } from "../enums/toast";
-import { addProduct } from "../api/menuService";
-import { EMPTY_PRODUCT, type ProductType } from "../enums/product";
+import { addProduct, doesProductExistBySlug } from "../api/menuService";
+import { EMPTY_PRODUCT, type ProductToAddType, type ProductType } from "../enums/product";
 import { slugify } from "../utils/string";
 
 
 export default function AddProductForm() {
 
   // Omit<T, K> -> prends le type T, mais enlève les propriétés K
-  const [product, setProduct] = useState<Omit<ProductType, "createdAt" | "lastUpdate" | "slug">>(EMPTY_PRODUCT);
+  // const [product, setProduct] = useState<Omit<ProductType, "id" | "createdAt" | "lastUpdate" | "slug">>(EMPTY_PRODUCT);
+  const [product, setProduct] = useState<ProductToAddType>(EMPTY_PRODUCT);
+
 
   const [errors, setErrors] = useState<Partial<Record<keyof ProductType, string>>>({});
 
@@ -62,8 +64,17 @@ export default function AddProductForm() {
 
     setErrors({}); // clean les erreurs si tout va bien
 
+    if (await doesProductExistBySlug(slugify(product.productName))) {
+      
+      // setErrors(() => ({
+      //   productName: "Ce produit existe déjà",
+      // }));
+      toast.error("Un produit du même nom existe déjà", DEFAULT_TOAST_OPTIONS)
+      return;
+    }
+
     const now = new Date();
-    const productToAdd: ProductType = {
+    const productToAdd: ProductToAddType = {
       ...product,
       createdAt: Timestamp.fromDate(now),
       lastUpdate: Timestamp.fromDate(now),
@@ -225,10 +236,10 @@ export default function AddProductForm() {
       <div className="bg-gray-400">
         {product?.imageSource ? (<img src={product.imageSource} alt={"image-preview"} />) : (<div className="h-[300px] w-[300px] flex items-center justify-center border border-amber-300">Aucune Image</div>)}
       </div>
-          <ToastContainer />
+      <ToastContainer />
     </div>
   );
-  
+
 }
 
 /*

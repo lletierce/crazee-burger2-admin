@@ -2,6 +2,7 @@ import { Timestamp } from "firebase/firestore"
 
 
 export type ProductType = {
+  id: string;
   productName: string;
   price: number;
   imageSource: string;
@@ -12,6 +13,19 @@ export type ProductType = {
   lastUpdate: Timestamp;
   productType: string;
   slug: string,
+};
+
+export type ProductToAddType = {
+  productName: string;
+  price: number;
+  imageSource: string;
+  quantity: number;
+  isAvailable: boolean;
+  isPromoted: boolean;
+  productType: string;
+  createdAt?: Timestamp;
+  lastUpdate?: Timestamp;
+  slug?: string,
 };
 
 

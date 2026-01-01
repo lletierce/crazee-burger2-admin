@@ -1,6 +1,6 @@
-import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, query, setDoc, Timestamp, where, type DocumentData } from "firebase/firestore"
+import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, limit, query, setDoc, Timestamp, where, type DocumentData } from "firebase/firestore"
 import { db } from "./firebase-config"
-import type { ProductType } from "../enums/product";
+import type { ProductToAddType, ProductType } from "../enums/product";
 
 export const deleteProduct = async (id: string) => {
     await deleteDoc(doc(db, "products", id));
@@ -35,7 +35,7 @@ export const getProductBySlug = async (slug: string): Promise<ProductType | null
 }
 
 
-export const addProduct = async (productToAdd: ProductType) => {
+export const addProduct = async (productToAdd: ProductToAddType) => {
   await addDoc(collection(db, "products"), productToAdd);
 }
 
@@ -52,6 +52,21 @@ export const updateProduct = async ( idProduct: string, data: Partial<DocumentDa
   }
 };
 
+export const doesProductExistBySlug  = async (slug: string): Promise<boolean> => {
+  if (!slug) return false;
+
+    const productsRef = collection(db, "products");
+    
+    const q = query(
+    productsRef,
+    where("slug", "==", slug),
+    limit(1) // optimisation : on s'arrête au premier match
+  );
+
+    const snapshot = await getDocs(q);
+  
+  return !snapshot.empty;
+}
 
 
 export const findDocById = async <T = any>(
