@@ -19,6 +19,7 @@ export default function LateralLeftPanel() {
       </div>
       <div className='m-20'>
         <AddProductForm />
+        {/* LateralLeftPanel */}
       </div>
     </div>
   )

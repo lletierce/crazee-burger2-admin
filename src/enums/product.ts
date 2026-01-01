@@ -2,7 +2,6 @@ import { Timestamp } from "firebase/firestore"
 
 
 export type ProductType = {
-  id: string;
   productName: string;
   price: number;
   imageSource: string;
@@ -15,10 +14,10 @@ export type ProductType = {
   slug: string,
 };
 
+
 export const IMAGE_NOT_AVAILABLE = "/images/img-not-available.jpg"
 
 export const EMPTY_PRODUCT = Object.freeze({
-  id: "",
   productName: "",
   price: 0,
   imageSource: "",

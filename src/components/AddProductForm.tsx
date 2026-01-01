@@ -1,15 +1,16 @@
 import { Timestamp } from "firebase/firestore";
 import { useState, type FormEvent } from "react";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { ADD_PRODUCT_FAIL_MESSAGE, ADD_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS } from "../enums/toast";
 import { addProduct } from "../api/menuService";
 import { EMPTY_PRODUCT, type ProductType } from "../enums/product";
+import { slugify } from "../utils/string";
 
 
 export default function AddProductForm() {
 
   // Omit<T, K> -> prends le type T, mais enlève les propriétés K
-  const [product, setProduct] = useState<Omit<ProductType, "createdAt" | "lastUpdate">>(EMPTY_PRODUCT);
+  const [product, setProduct] = useState<Omit<ProductType, "createdAt" | "lastUpdate" | "slug">>(EMPTY_PRODUCT);
 
   const [errors, setErrors] = useState<Partial<Record<keyof ProductType, string>>>({});
 
@@ -66,6 +67,7 @@ export default function AddProductForm() {
       ...product,
       createdAt: Timestamp.fromDate(now),
       lastUpdate: Timestamp.fromDate(now),
+      slug: slugify(product.productName)
     };
 
     try {
@@ -81,6 +83,156 @@ export default function AddProductForm() {
   }
 
   return (
+    <div className="bg-gray-50 flex items-center justify-center px-4 py-10">
+      <form
+        onSubmit={handleSubmit}
+        className="
+          bg-white shadow-lg rounded-2xl p-8 w-full max-w-lg
+          flex flex-col gap-6
+        "
+      >
+        <h2 className="text-2xl font-semibold text-gray-800 text-center">
+          🛍️ Ajouter un produit
+        </h2>
+
+        {/* Nom du produit */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Nom du produit<span className="text-red-500">*</span></label>
+          <input
+            type="text"
+            name="productName"
+            value={product ? product.productName : ""}
+            onChange={handleChange}
+            placeholder="Ex: Burger"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            required
+          />
+        </div>
+
+        {/* URL de l'image */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Image (URL)</label>
+          <input
+            type="url"
+            name="imageSource"
+            value={product ? product.imageSource : ""}
+            onChange={handleChange}
+            placeholder="https://exemple.com/mon-produit.jpg"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          />
+        </div>
+
+        {/* Catégorie | productType */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Catégorie<span className="text-red-500">*</span></label>
+          <select
+            name="productType"
+            value={product.productType}
+            onChange={handleChange}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          >
+            <option value="">Choisir une catégorie</option>
+            <option value="burger">Burger</option>
+            <option value="boisson">Boisson</option>
+            <option value="accompagnement">Accompagnement</option>
+          </select>
+          <p className="text-red-500 text-sm">{errors.productType}</p>
+        </div>
+
+        {/* Prix */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Prix (€)<span className="text-red-500">*</span></label>
+          <input
+            type="number"
+            name="price"
+            value={product ? product.price : 0}
+            onChange={handleChange}
+            placeholder="Ex: 49.99"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            required
+          />
+          {errors.price && <p className="text-red-500 text-sm">{errors.price}</p>}
+        </div>
+
+
+        {/* Quantité */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Quantité<span className="text-red-500">*</span></label>
+          <input
+            type="number"
+            name="quantity"
+            value={product ? product.quantity : 0}
+            onChange={handleChange}
+            placeholder="Ex: 100"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            required
+          />
+          {errors.quantity && (<p className="text-red-500 text-sm">{errors.quantity}</p>)}
+        </div>
+
+        {/* Disponibilité */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Disponibilité<span className="text-red-500">*</span></label>
+          <select
+            name="isAvailable"
+            value={product.isAvailable ? "true" : "false"}
+            onChange={(e) =>
+              setProduct((prev) => ({
+                ...prev,
+                isAvailable: e.target.value === "true",
+              }))
+            }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition cursor-pointer"
+          >
+            <option value="true">Disponible</option>
+            <option value="false">Non disponible</option>
+          </select>
+        </div>
+
+        {/* Promouvoir */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-1">Promouvoir<span className="text-red-500">*</span></label>
+          <select
+            name="isAvailable"
+            value={product.isPromoted ? "true" : "false"}
+            onChange={(e) =>
+              setProduct((prev) => ({
+                ...prev,
+                isPromoted: e.target.value === "true",
+              }))
+            }
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+          >
+            <option value="true">Avec publicité</option>
+            <option value="false">Sans publicité</option>
+          </select>
+        </div>
+
+
+
+        {/* Bouton d’envoi */}
+        <button
+          type="submit"
+          className="
+            bg-blue-600 text-white font-semibold py-2 rounded-lg cursor-pointer
+            hover:bg-blue-700 transition 
+            focus:outline-none focus:ring-2 focus:ring-blue-500
+          "
+        >
+          Ajouter
+        </button>
+      </form>
+      <div className="bg-gray-400">
+        {product?.imageSource ? (<img src={product.imageSource} alt={"image-preview"} />) : (<div className="h-[300px] w-[300px] flex items-center justify-center border border-amber-300">Aucune Image</div>)}
+      </div>
+          <ToastContainer />
+    </div>
+  );
+  
+}
+
+/*
+return (
     <div>
       <form onSubmit={handleSubmit}>
         <h1 className="text-3xl">Ajouter un nouveau produit</h1>
@@ -191,4 +343,4 @@ export default function AddProductForm() {
       </form>
     </div>
   )
-}
+*/
