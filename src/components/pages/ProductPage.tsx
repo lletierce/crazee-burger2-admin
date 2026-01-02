@@ -15,15 +15,13 @@ export default function ProductPage() {
   const [productSelected, setProductSelected] = useState<ProductType | null>(null);
   const [isEditable, setIsEditable] = useState(false)
   const [loading, setLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
   const navigate = useNavigate()
-
-  // const { idProductSelected } = useProduct();
   const { slug } = useParams(); // params.slug
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
 
-
+  // [Produits] > ProductCategory > ProductName
   const handleClickOnProducts = () => {
     navigate(`../`)
   }
@@ -55,6 +53,7 @@ export default function ProductPage() {
 
         if (data !== null) {
           setProductSelected(data)
+          // setSelectedProductId(data.id)
         }
       }
       catch (err) {
@@ -79,7 +78,6 @@ export default function ProductPage() {
     <PageLayout>
       <div className="bg-purple-400 h-full md:h-[85vh] md:px-4">
         <div className="bg-yellow-400 h-[10vh] max-h-[60px] flex items-center justify-between px-4">
-          {/* <span>{"Produits > Boissons > "} {productSelected.productName}</span> */}
           <ul className="flex list-none gap-2">
             <li><span className="cursor-pointer hover:underline" onClick={handleClickOnProducts}>Produits</span></li>
             <li>{"> "}<span className="capitalize">{productSelected.productType}</span></li>
@@ -95,7 +93,6 @@ export default function ProductPage() {
             <button
               className="cursor-pointer hover:bg-red-900"
               onClick={() => {
-                setSelectedProductId(selectedProductId);
                 setIsDialogOpen(true);
               }}
             >
@@ -129,7 +126,7 @@ export default function ProductPage() {
       <ConfirmDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onConfirm={() => selectedProductId && handleDelete(selectedProductId)}
+        onConfirm={() => productSelected && handleDelete(productSelected.id)}
         message="Êtes-vous sûr de vouloir supprimer ce produit ?"
       />
     </PageLayout>

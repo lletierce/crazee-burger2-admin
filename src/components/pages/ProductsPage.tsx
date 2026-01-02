@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import PageLayout from '../layouts/PageLayout';
 import Card from '../reusable-ui/card/Card';
-import { collection, getDocs, limit, orderBy, query, startAfter, type DocumentData, type QueryDocumentSnapshot } from 'firebase/firestore';
+import { collection, getDocs, limit, orderBy, query, startAfter, type QueryDocumentSnapshot } from 'firebase/firestore';
 import { db } from '../../api/firebase-config';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { toast, ToastContainer } from 'react-toastify';
 import ConfirmDialog from '../reusable-ui/ConfirmDialog';
 import { DEFAULT_TOAST_OPTIONS, DELETE_PRODUCT_FAIL_MESSAGE, DELETE_PRODUCT_SUCCESS_MESSAGE } from '../../enums/toast';
-import { deleteProduct, findDocById, mapFirestoreProduct } from '../../api/menuService';
+import { deleteProduct, mapFirestoreProduct } from '../../api/menuService';
 import { useProduct } from '../../context/ProductContext';
 import type { ProductType } from '../../enums/product';
 import { slugify } from '../../utils/string';

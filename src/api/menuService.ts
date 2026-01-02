@@ -7,17 +7,17 @@ export const deleteProduct = async (id: string) => {
     // additional instructions possible here if needed
 }
 
-export const getProduct = async (idProduct: string) => {
-    // docRef = doc(PATH) => db\products\81dQsvr9X..
-    const docRef = doc(db, "products", idProduct)
-    const docSnapshot = await getDoc(docRef)
+// export const getProduct = async (idProduct: string) => {
+//     // docRef = doc(PATH) => db\products\81dQsvr9X..
+//     const docRef = doc(db, "products", idProduct)
+//     const docSnapshot = await getDoc(docRef)
 
-    if (docSnapshot.exists()) {
-        const productReceived = docSnapshot.data()
-        //console.log("productReceived: ", productReceived)
-        return productReceived
-    }
-}
+//     if (docSnapshot.exists()) {
+//         const productReceived = docSnapshot.data()
+//         //console.log("productReceived: ", productReceived)
+//         return productReceived
+//     }
+// }
 
 export const getProductBySlug = async (slug: string): Promise<ProductType | null> => {
   const productsRef = collection(db, "products");    
@@ -69,20 +69,20 @@ export const doesProductExistBySlug  = async (slug: string): Promise<boolean> =>
 }
 
 
-export const findDocById = async <T = any>(
-  collectionName: string,
-  docId: string
-): Promise<(T & { id: string }) | null> => {
-  const docRef = doc(db, collectionName, docId);
-  const docSnap = await getDoc(docRef);
+// export const findDocById = async <T = any>(
+//   collectionName: string,
+//   docId: string
+// ): Promise<(T & { id: string }) | null> => {
+//   const docRef = doc(db, collectionName, docId);
+//   const docSnap = await getDoc(docRef);
 
-  if (!docSnap.exists()) {
-    console.log("Aucun document trouvé");
-    return null;
-  }
+//   if (!docSnap.exists()) {
+//     console.log("Aucun document trouvé");
+//     return null;
+//   }
 
-  return { id: docSnap.id, ...docSnap.data() } as T & { id: string };
-};
+//   return { id: docSnap.id, ...docSnap.data() } as T & { id: string };
+// };
 
 
 export const mapFirestoreProduct = (doc: any): ProductType => {
