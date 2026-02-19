@@ -1,22 +1,45 @@
 import { useNavigate, useParams } from "react-router-dom"
 import PageLayout from "../layouts/PageLayout"
-import { useEffect, useState } from "react";
-import { IMAGE_NOT_AVAILABLE, type ProductType } from "../../enums/product";
-import ImagePreview from "../reusable-ui/ImagePreview";
+import { useEffect, useState, type FormEvent } from "react";
 import { deleteProduct, getProductBySlug } from "../../api/menuService";
 import ConfirmDialog from "../reusable-ui/ConfirmDialog";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS, DELETE_PRODUCT_FAIL_MESSAGE, DELETE_PRODUCT_SUCCESS_MESSAGE } from "../../enums/toast";
 import EditProductForm from "../EditProductForm";
+import ProductForm from "../ProductForm";
+import type { ProductType } from "../../enums/product";
+
+export type ProductEditingType = {
+  productName: string;
+  price: number;
+  imageSource: string;
+  quantity: number;
+  isAvailable: boolean;
+  isPromoted: boolean;
+  productType: string;
+}
+
+const EMPTY_PRODUCT_EDITING = Object.freeze({
+  productName: "",
+  price: 0,
+  imageSource: "",
+  quantity: 0,
+  isAvailable: false,
+  isPromoted: false,
+  productType: "",
+})
 
 
 export default function ProductPage() {
 
   const [productSelected, setProductSelected] = useState<ProductType | null>(null);
-  const [isEditable, setIsEditable] = useState(false)
+  const [productEditing, setProductEditing] = useState<ProductEditingType>(EMPTY_PRODUCT_EDITING);
+
+
+  const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  
+
   const navigate = useNavigate()
   const { slug } = useParams(); // params.slug
 
@@ -30,7 +53,7 @@ export default function ProductPage() {
     try {
       deleteProduct(id)
       toast.success(DELETE_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS)
-      navigate(`../`)
+      navigate(`../`) // TODO : replace w. static path(from enum) to avoid unpredictable redirection
     }
     catch (error) {
       toast.error(DELETE_PRODUCT_FAIL_MESSAGE, DEFAULT_TOAST_OPTIONS)
@@ -39,8 +62,23 @@ export default function ProductPage() {
 
 
   const handleEdit = () => {
-    // setIsEditable(!isEditable)
-    console.log(isEditable)
+    setIsEditing(!isEditing)
+    //console.log(isEditing)
+  }
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+
+    setProductEditing((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    //console.log({[name]: value})
+  }
+
+  const handleSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    console.log("handlesubmit")
   }
 
   const fetchProduct = async () => {
@@ -53,7 +91,16 @@ export default function ProductPage() {
 
         if (data !== null) {
           setProductSelected(data)
-          // setSelectedProductId(data.id)
+          {/* TODO: REFACTO !!! */}
+          setProductEditing({
+            productName: data.productName,
+            price: data.price,
+            imageSource: data.imageSource,
+            quantity: data.quantity,
+            isAvailable: data.isAvailable,
+            isPromoted: data.isPromoted,
+            productType: data.productType,
+          })
         }
       }
       catch (err) {
@@ -69,8 +116,9 @@ export default function ProductPage() {
     fetchProduct();
   }, []);
 
-  if (!productSelected) return <p>Chargement...</p>;
   
+  if (!productSelected) return <p>Chargement...</p>;
+
   if (loading) return <p>Chargement...</p>;
 
 
@@ -88,7 +136,7 @@ export default function ProductPage() {
               className="cursor-pointer hover:bg-blue-900"
               onClick={handleEdit}
             >
-              {isEditable ? "Annuler" : "Modifier"}
+              {isEditing ? "Annuler" : "Modifier"}
             </button>
             <button
               className="cursor-pointer hover:bg-red-900"
@@ -101,7 +149,23 @@ export default function ProductPage() {
           </div>
         </div>
         <div className="bg-green-700 flex flex-1 flex-col-reverse md:flex-row overflow-hidden">
-          <div className="bg-orange-400 flex-1">
+          { isEditing ? <EditProductForm /> : <ProductForm productSelected={productSelected} />}
+        </div>
+      </div>
+      <ConfirmDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onConfirm={() => productSelected && handleDelete(productSelected.id)}
+        message="Êtes-vous sûr de vouloir supprimer ce produit ?"
+      />
+    </PageLayout>
+  )
+}
+
+
+
+/*
+<div className="bg-orange-400 flex-1">
             {isEditable ? <EditProductForm /> :
               <>
                 <h2>{productSelected.productName}</h2>
@@ -120,15 +184,6 @@ export default function ProductPage() {
               </>
             }
           </div>
+*/
 
-        </div>
-      </div>
-      <ConfirmDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        onConfirm={() => productSelected && handleDelete(productSelected.id)}
-        message="Êtes-vous sûr de vouloir supprimer ce produit ?"
-      />
-    </PageLayout>
-  )
-}
+
