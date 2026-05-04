@@ -30,15 +30,13 @@ export const INIT_PRODUCT_TO_DISPLAY = Object.freeze({
     lastUpdate: Timestamp.fromDate(new Date("2000-01-01T00:00:00Z")),
 })
 
-// 946684800000
-
 export default function ProductForm({ productSelected }: ProductFormProps) {
 
     const [productToDisplay, setProductToDisplay] = useState<ProductToDisplayType>(INIT_PRODUCT_TO_DISPLAY)
 
     useEffect(() => {
         setProductToDisplay(productSelected)
-        console.log(productSelected);
+        // console.log(productSelected);
     }, [])
 
     return (
@@ -133,6 +131,17 @@ export default function ProductForm({ productSelected }: ProductFormProps) {
                     />
                 </div>
 
+                {/* Date de création (en readonly) */}
+                <div>
+                    <label className="block text-gray-700 font-medium mb-1">Date de création</label>
+                    <input
+                        type="text"
+                        name="createdAt"
+                        defaultValue={productSelected?.createdAt.toDate().toLocaleDateString()}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 cursor-default"
+                        readOnly
+                    />
+                </div>
 
                 {/* Dernière modification (en readonly) */}
                 <div>
@@ -141,18 +150,6 @@ export default function ProductForm({ productSelected }: ProductFormProps) {
                         type="text"
                         name="lastUpdate"
                         defaultValue={productSelected?.lastUpdate.toDate().toLocaleDateString()}
-                        className="w-full border border-gray-300 rounded-lg px-3 py-2 cursor-default"
-                        readOnly
-                    />
-                </div>
-
-                {/* Date de création (en readonly) */}
-                <div>
-                    <label className="block text-gray-700 font-medium mb-1">Date de création</label>
-                    <input
-                        type="text"
-                        name="createdAt"
-                        defaultValue={productSelected?.createdAt.toDate().toLocaleDateString()}
                         className="w-full border border-gray-300 rounded-lg px-3 py-2 cursor-default"
                         readOnly
                     />

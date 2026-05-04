@@ -1,24 +1,51 @@
-import { useState } from "react";
-import { useProduct } from "../context/ProductContext";
-import { updateProduct } from "../api/menuService";
+import { useEffect, useState } from "react";
+import { doesProductExistBySlug, updateProduct } from "../api/menuService";
 import { Timestamp, type DocumentData } from "firebase/firestore";
 import { toast, ToastContainer } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS, EDIT_PRODUCT_FAIL_MESSAGE, EDIT_PRODUCT_SUCCESS_MESSAGE } from "../enums/toast";
+import { EMPTY_PRODUCT, type ProductEditingType, type ProductType } from "../enums/product";
+import { isProductChanged, toProductEditingType } from "../utils/product";
+import { slugify } from "../utils/string";
+import { useEditing } from "../context/EditingContext";
+import { useNavigate } from "react-router-dom";
 
-export default function EditProductForm() {
+type EditProductFormProps = {
+    productSelected: ProductType;
+};
 
-  const { productSelected, setProductSelected } = useProduct();
+const EMPTY_PRODUCT_EDITING = Object.freeze({
+  productName: "",
+  price: 0,
+  imageSource: "",
+  quantity: 0,
+  isAvailable: false,
+  isPromoted: false,
+  productType: "",
+})
 
-  const [productEdited, setProductEdited] = useState<DocumentData>(productSelected);
+
+export default function EditProductForm({productSelected} : EditProductFormProps) {
+
+  const [initialProduct, setInitialProduct] = useState<ProductEditingType | null>(null);
+  const [productEdited, setProductEdited] = useState<ProductEditingType>(EMPTY_PRODUCT_EDITING);
+
   const [errors, setErrors] = useState<Partial<Record<keyof DocumentData, string>>>({});
+  const [loading, setLoading] = useState(false)
+
+  const { stopEditing } = useEditing();
+  const navigate = useNavigate()
+
+
+
+  const isDirty = initialProduct && productEdited ? isProductChanged(initialProduct, productEdited) : false;
   
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { name, type, value } = e.target;
 
     setProductEdited((prev) => ({
       ...prev,
-      [name]: value,
+       [name]: type === "number" ? Number(value) : value
     }));
   }
 
@@ -29,6 +56,7 @@ export default function EditProductForm() {
       // if (!productEdited.productName.trim()) {
       //   newErrors.productName = "Le nom du produit est requis";
       // }
+      if (!productEdited) { return {};}
   
       if (productEdited.price < 0) {
         newErrors.price = "Le prix doit être supérieur ou égal à 0";
@@ -45,11 +73,6 @@ export default function EditProductForm() {
       return newErrors;
     }
 
-  
-  const updateProductSelected = (UpdatedProdcut: DocumentData) => { 
-    setProductSelected(UpdatedProdcut)
-   }
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,19 +84,31 @@ export default function EditProductForm() {
     }
 
     setErrors({}); // clean les erreurs si tout va bien
+
+    // setLoading(true)
+    // check if new slug already exist
+    const newSlug = slugify(productEdited.productName)
+    if(newSlug != productSelected.slug) {
+      if (await doesProductExistBySlug(newSlug)) {
+            toast.error("Un produit du même nom existe déjà", DEFAULT_TOAST_OPTIONS)
+            return;
+          }
+    }
     
     const now = new Date();
     const productToEdit: DocumentData = {
           ...productEdited,
           lastUpdate: Timestamp.fromDate(now),
+          slug: newSlug,
         };
 
     try {
-      updateProduct(productSelected.id, productToEdit)
-      updateProductSelected(productToEdit)
-      toast.success(EDIT_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS)
-      //console.log("Produit modifié :", productSelected);
-
+       updateProduct(productSelected.id, productToEdit)
+       //stopEditing
+        navigate(`../produits/${newSlug}`)
+       toast.success(EDIT_PRODUCT_SUCCESS_MESSAGE, DEFAULT_TOAST_OPTIONS)
+      //console.log("Produit selected :", productSelected);
+      //console.log("Produit edited :", productToEdit);
     }
     catch(err){
     console.log("erreur lors de la modif :", err);
@@ -81,9 +116,18 @@ export default function EditProductForm() {
     }
   };
 
+   useEffect(() => {
+           if (!productSelected) return;
+
+           const editingProduct = toProductEditingType(productSelected);
+
+          setInitialProduct(editingProduct);
+          setProductEdited(editingProduct)
+
+      }, [productSelected])
 
   return (
-    <div className="bg-gray-50 flex items-center justify-center px-4 py-10">
+    <div className="bg-gray-50 flex items-center justify-center px-4 py-10 w-full md:max-h-[80vh] ">
       <form
         onSubmit={handleSubmit}
         className="
@@ -129,7 +173,7 @@ export default function EditProductForm() {
             name="productType"
             value={productEdited.productType}
             onChange={handleChange}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition cursor-pointer"
           >
             <option value="">Choisir une catégorie</option>
             <option value="burger">Burger</option>
@@ -201,7 +245,7 @@ export default function EditProductForm() {
                 isPromoted: e.target.value === "true",
               }))
             }
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition"
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition cursor-pointer"
           >
             <option value="true">Avec publicité</option>
             <option value="false">Sans publicité</option>
@@ -209,7 +253,7 @@ export default function EditProductForm() {
         </div>
 
 
-        {/* Date de création */}
+        {/* Date de création (en readonly) */}
         <div className="text-gray-400">
           <label className="block font-medium mb-1">Date de création</label>
           <input
@@ -222,7 +266,7 @@ export default function EditProductForm() {
         </div>
 
 
-        {/* Dernière modification */}
+        {/* Dernière modification (en readonly) */}
         <div className="text-gray-400">
           <label className="block  font-medium mb-1">Date de la dernière modification</label>
           <input
@@ -238,17 +282,21 @@ export default function EditProductForm() {
         {/* Bouton d’envoi */}
         <button
           type="submit"
+          disabled={!isDirty}
           className="
             bg-blue-600 text-white font-semibold py-2 rounded-lg cursor-pointer
             hover:bg-blue-700 transition 
             focus:outline-none focus:ring-2 focus:ring-blue-500
+            disabled:bg-blue-400 disabled:text-gray-200 disabled:cursor-not-allowed
           "
         >
           Modifier
         </button>
       </form>
-      <div className="bg-gray-400">
-        {productEdited?.imageSource ? (<img src={productEdited.imageSource} alt={"image-preview"} />) : (<div className="h-[300px] w-[300px] flex items-center justify-center border border-amber-300">Aucune Image</div>)}
+      <div className="h-full">
+        <div className="bg-gray-400">
+          {productEdited?.imageSource ? (<img src={productEdited.imageSource} alt={"image-preview"} />) : (<div className="h-[400px] w-[400px] flex items-center justify-center border border-amber-300">Aucune Image</div>)}
+        </div>
       </div>
           <ToastContainer />
     </div>

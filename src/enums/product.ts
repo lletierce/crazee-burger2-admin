@@ -28,6 +28,16 @@ export type ProductToAddType = {
   slug?: string,
 };
 
+//export type ProductEditingType = Omit< ProductType, "id" | "createdAt" | "lastUpdate" | "slug">;
+export type ProductEditingType = {
+  productName: string;
+  price: number;
+  imageSource: string;
+  quantity: number;
+  isAvailable: boolean;
+  isPromoted: boolean;
+  productType: string;
+}
 
 export const IMAGE_NOT_AVAILABLE = "/images/img-not-available.jpg"
 

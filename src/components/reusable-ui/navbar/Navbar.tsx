@@ -1,12 +1,30 @@
 import { BsPersonCircle } from 'react-icons/bs'
 import { MdMenu } from 'react-icons/md'
 import LogoText from '../logo/LogoText'
+import { logout } from '../../../api/authService'
+import { useNavigate } from 'react-router-dom';
 
 export default function Navbar() {
+
+    const navigate = useNavigate();
+
+    const handleLogout = async() => { 
+        await logout();
+        navigate(`/login`);
+    }
+
     return (
         <nav>
             <div className='flex md:hidden bg-red-500 h-[8vh] min-h-[64px] w-full fixed top-0 z-20'>NavbarMobile</div>
-            <div className='hidden md:flex bg-blue-500 h-[10vh] px-6'>NavbarDesktop</div>
+            <div className='hidden md:flex bg-blue-500 h-[10vh] px-6'>
+                <h3>NavbarDesktop</h3>
+                <div 
+                    className='bg-amber-200 cursor-pointer hover:text-amber-200'
+                    onClick={() => {handleLogout()}}
+                >
+                    Se déconnecter
+                </div>
+            </div>
         </nav>
     )
 }

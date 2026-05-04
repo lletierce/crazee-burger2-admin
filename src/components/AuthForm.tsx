@@ -20,7 +20,7 @@ export default function AuthForm() {
     try {
       await login(email, password);
       setError('');
-      navigate('/dashboard'); // redirection
+      navigate('/produits'); // redirection
     } catch (err: any) {
       // setError(err.message);
       setError(LOGIN_FAILURE_MESSAGE);
