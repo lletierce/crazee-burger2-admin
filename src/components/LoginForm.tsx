@@ -70,7 +70,7 @@ export default function LoginForm() {
                 type="submit">
                 Connexion
             </button>
-            <p className="cursor-pointer text-sm md:hover:underline text-[#f56a2c]" onClick={() => handleRecover()}>Vous avez oublié votre mot de passe ?</p>
+                <p className="w-fit cursor-pointer text-sm md:hover:underline text-[#f56a2c]" onClick={() => handleRecover()}>Vous avez oublié votre mot de passe ?</p>
             {/* <p className="text-gray-500 text-xs  flex justify-center">Plus d'options de connexion</p> */}
         </form>
     );
