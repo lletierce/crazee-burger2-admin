@@ -2,7 +2,6 @@ import { Navigate, Route, Routes } from 'react-router-dom';
 import './App.css'
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
-//import LoginPage from './components/pages/LoginPage';
 import ProductsPage from './components/pages/ProductsPage';
 import ErrorPage from './components/pages/ErrorPage';
 import ProductPage from './components/pages/ProductPage';
@@ -14,6 +13,7 @@ import ResetPasswordSuccessPage from './components/pages/ResetPasswordSuccess';
 import LoadingPage from './components/pages/LoadingPage';
 import { lazy } from 'react';
 import LazyRoute from './components/reusable-ui/LazyRoute.tsx';
+import RecoveryPageSkeleton from './components/auth/RecoveryPageSkeleton.tsx';
 
 function App() {
   const { user, loading } = useAuth();
@@ -21,7 +21,6 @@ function App() {
   const LoginPage = lazy(() => import("./components/pages/LoginPage.tsx"));
   const RecoveryPage = lazy(() => import("./components/pages/RecoveryPage.tsx"));
 
-  // if (loading) return <h1>Chargement...</h1>;
   if (loading) return <LoadingPage />;
 
   return (
@@ -41,14 +40,14 @@ function App() {
       <Route
         path="/recovery"
         element={
-          <LazyRoute fallback={<LoadingPage />}>
+          <LazyRoute fallback={<RecoveryPageSkeleton />}>
             <RecoveryPage />
           </LazyRoute>
         }
       />
 
-      <Route path="/recovery-send" element={<RecoverySendPage />} />
-      {/* <Route path="/recovery-send" element={<LoadingPage />} /> */}
+      {/* <Route path="/recovery-send" element={<RecoverySendPage />} /> */}
+      <Route path="/recovery-send" element={<RecoveryPageSkeleton />} />
 
 
 
