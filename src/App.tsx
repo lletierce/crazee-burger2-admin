@@ -5,15 +5,14 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ProductsPage from './components/pages/ProductsPage';
 import ErrorPage from './components/pages/ErrorPage';
 import ProductPage from './components/pages/ProductPage';
-import RecoveryPage from './components/pages/RecoveryPage';
-import RecoverySendPage from './components/pages/RecoverySendPage';
 import ResetPasswordPage from './components/pages/ResetPasswordPage ';
 import Dashboard from './components/pages/tmp/Dashboard';
 import ResetPasswordSuccessPage from './components/pages/ResetPasswordSuccess';
 import LoadingPage from './components/pages/LoadingPage';
 import { lazy } from 'react';
 import LazyRoute from './components/reusable-ui/LazyRoute.tsx';
-import RecoveryPageSkeleton from './components/auth/RecoveryPageSkeleton.tsx';
+import RecoveryPageSkeleton from './components/auth/RecoveryPassword/RecoveryPageSkeleton.tsx';
+import DebugIDLE from './components/pages/tmp/debug/DebugIDLE.tsx';
 
 function App() {
   const { user, loading } = useAuth();
@@ -46,8 +45,7 @@ function App() {
         }
       />
 
-      {/* <Route path="/recovery-send" element={<RecoverySendPage />} /> */}
-      <Route path="/recovery-send" element={<RecoveryPageSkeleton />} />
+      <Route path="/debug" element={<DebugIDLE />} />
 
 
 

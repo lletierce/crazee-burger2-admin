@@ -9,7 +9,7 @@ type AuthLayoutProps = {
     titleVariant?: "default" | "skeleton";
     labelActionBtn?: string;
     onClickActionBtn?: () => void;
-    logoVariant?: "default" | "success" | "skeleton";
+    logoVariant?: "default" | "success" | "error" | "skeleton";
 
 
 };

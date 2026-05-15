@@ -1,6 +1,7 @@
 // import React from 'react'
 
 import { Suspense } from "react";
+import LoadingPage from "../pages/LoadingPage";
 
 type LazyRouteProps = {
     children: React.ReactNode;
@@ -9,7 +10,7 @@ type LazyRouteProps = {
 
 export default function LazyRoute({
     children,
-    fallback = <div>Chargement...</div>,
+    fallback = <LoadingPage />,
 }: LazyRouteProps) {
 
     return (

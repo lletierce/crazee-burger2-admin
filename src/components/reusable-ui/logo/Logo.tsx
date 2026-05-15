@@ -1,7 +1,8 @@
-import { FaCircleCheck } from "react-icons/fa6";
+import { BiSolidCheckCircle } from "react-icons/bi";
+import { BiSolidErrorCircle } from "react-icons/bi";
 
 type LogoProps = {
-    variant?: "default" | "success" | "skeleton";
+    variant?: "default" | "success" | "error" | "skeleton";
 }
 
 export default function Logo({ variant = "default" }: LogoProps) {
@@ -21,7 +22,15 @@ export default function Logo({ variant = "default" }: LogoProps) {
     if (variant == "success") {
         return (
             <div className="text-[#60bd4f] flex justify-center items-center text-center">
-                <FaCircleCheck className="object-contain object-center text-8xl" />
+                <BiSolidCheckCircle className="object-contain object-center text-8xl"  />
+            </div>
+        )
+    }
+
+    if (variant == "error") {
+        return (
+            <div className="text-[#e25549] flex justify-center items-center text-center">
+                <BiSolidErrorCircle className="object-fit object-center text-8xl" />
             </div>
         )
     }

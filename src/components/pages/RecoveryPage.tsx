@@ -1,57 +1,98 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import AuthLayout from '../layouts/AuthLayout'
-import { LOGIN_FAILURE_MESSAGE } from '../../enums/auth';
 import { resetPassword } from '../../api/authService';
 import { useNavigate } from 'react-router-dom';
+import RecoveryPasswordForm from '../auth/RecoveryPassword/RecoveryPasswordForm';
+import RecoveryPasswordSendSkeleton from '../auth/RecoveryPassword/RecoveryPasswordSendSkeleton';
 
 export default function RecoveryPage() {
 
-    const [email, setEmail] = useState('');
-    const [error, setError] = useState('');
+    const RecoveryPasswordSend = lazy(() => import("../auth/RecoveryPassword/RecoveryPasswordSend.tsx"));
+    const RecoveryPasswordError = lazy(() => import("../auth/RecoveryPassword/RecoveryPasswordError.tsx"));
+
+    const STATUS = {
+        IDLE: 'default',
+        SEND: 'send',
+        ERROR: 'error',
+    } as const;
+    type QueryStatus = (typeof STATUS)[keyof typeof STATUS];
+
+ 
+    const LOGOVARIANT = {
+        DEFAULT: 'default',
+        SUCCESS: 'success',
+        ERROR: 'error',
+        SKELETON: 'skeleton',
+    } as const;
+    type LogoVariantChoice = (typeof LOGOVARIANT)[keyof typeof LOGOVARIANT];
+
+    const [queryStatus, setQueryStatus] = useState<QueryStatus>(STATUS.IDLE);
+    const [contentTitle, setContentTitle] = useState("Récupération du mot de passe")
+    const [contentLogoVariant, setContentLogoVariant] = useState<LogoVariantChoice>(LOGOVARIANT.DEFAULT)
 
     const navigate = useNavigate();
 
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-
+    const handleRecoveryPassword = async (email: string) => {
         try {
             await resetPassword(email);
-            setError('');
-            navigate('/recovery-send'); // redirection
-        } catch (err: any) {
-            setError(LOGIN_FAILURE_MESSAGE);
-            console.log("error - recovery")
+            setQueryStatus(STATUS.SEND)
+            setContentTitle("Récupération envoyée!")
+            setContentLogoVariant(LOGOVARIANT.SUCCESS)
+            //console.log("send - recovery")
         }
-    };
+        catch (err: any) {
+            setQueryStatus(STATUS.ERROR)
+            setContentTitle("Erreur rencontrée")
+            setContentLogoVariant(LOGOVARIANT.ERROR)
+            //console.log("error - recovery")
+        }
+    }
 
-    const handleReturnPage = () => {
+    const returnToLoginPage = () => {
         navigate("/login")
     }
 
+    const resetRecoveryContent = () => {
+            setQueryStatus(STATUS.IDLE)
+            setContentTitle("Récupération du mot de passe")
+            setContentLogoVariant(LOGOVARIANT.DEFAULT)
+    }
+   
+    const handleReturnButtonAction = () => { 
+        switch (queryStatus) {
+            case STATUS.IDLE:
+                returnToLoginPage();
+                break;
+            case STATUS.SEND:
+                returnToLoginPage();
+                break;
+            case STATUS.ERROR:
+                resetRecoveryContent();
+                break;
+            default:
+                returnToLoginPage();
+                break;
+        }
+     }
+
+    
+    const content = (() => {
+        switch (queryStatus) {
+            case STATUS.IDLE:
+                return <RecoveryPasswordForm handlerRecoveryPassword={handleRecoveryPassword} />;
+            case STATUS.SEND:
+                return <Suspense fallback={<RecoveryPasswordSendSkeleton />}><RecoveryPasswordSend /></Suspense>
+            case STATUS.ERROR:
+                return <Suspense fallback={<RecoveryPasswordSendSkeleton />}><RecoveryPasswordError /></Suspense>
+            default:
+                return <RecoveryPasswordForm handlerRecoveryPassword={handleRecoveryPassword} />;
+        }
+    })();
+
 
     return (
-        <AuthLayout title="Récupération du mot de passe" labelActionBtn='Retour' onClickActionBtn={handleReturnPage}>
-            <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-                <div>Indiquez l'adresse e-mail de votre compte pour recevoir un e-mail vous permetant de modifier votre mot de passe.</div>
-
-                {error && <p className="text-red-600">{error}</p>}
-                <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    placeholder="Email"
-                    maxLength={30}
-                    className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                <button
-                    className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition cursor-pointer"
-                    type="submit">
-                    Envoyer
-                </button>
-            </form>
+        <AuthLayout logoVariant={contentLogoVariant} title={contentTitle} labelActionBtn='Retour' onClickActionBtn={handleReturnButtonAction} >
+            {content}
         </AuthLayout>
     )
 }
