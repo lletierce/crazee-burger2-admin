@@ -5,20 +5,20 @@ import ProtectedRoute from './components/ProtectedRoute';
 import ProductsPage from './components/pages/ProductsPage';
 import ErrorPage from './components/pages/ErrorPage';
 import ProductPage from './components/pages/ProductPage';
-import ResetPasswordPage from './components/pages/ResetPasswordPage ';
 import Dashboard from './components/pages/tmp/Dashboard';
-import ResetPasswordSuccessPage from './components/pages/ResetPasswordSuccess';
 import LoadingPage from './components/pages/LoadingPage';
 import { lazy } from 'react';
 import LazyRoute from './components/reusable-ui/LazyRoute.tsx';
-import RecoveryPageSkeleton from './components/auth/RecoveryPassword/RecoveryPageSkeleton.tsx';
-import DebugIDLE from './components/pages/tmp/debug/DebugIDLE.tsx';
+import RecoveryPageSkeleton from './components/auth/recovery-password/RecoveryPageSkeleton.tsx';
+import ResetPageSkeleton from './components/auth/reset-password/ResetPageSkeleton.tsx';
 
 function App() {
   const { user, loading } = useAuth();
 
   const LoginPage = lazy(() => import("./components/pages/LoginPage.tsx"));
   const RecoveryPage = lazy(() => import("./components/pages/RecoveryPage.tsx"));
+  const ResetPasswordPage = lazy(() => import("./components/pages/ResetPasswordPage .tsx"));
+
 
   if (loading) return <LoadingPage />;
 
@@ -45,14 +45,23 @@ function App() {
         }
       />
 
-      <Route path="/debug" element={<DebugIDLE />} />
+      
+      {/* <Route path="/reset-password" element={<ResetPasswordPage />} /> */}
+      <Route
+        path="/reset-password"
+        element={
+          <LazyRoute fallback={<ResetPageSkeleton />}>
+            <ResetPasswordPage />
+          </LazyRoute>
+        }
+      />
 
 
-
-      <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/reset-success" element={<ResetPasswordSuccessPage />} />
+      {/* <Route path="/reset-success" element={<ResetPasswordSuccessPage />} /> */}
 
       /*debug */
+      <Route path="/debug" element={<ResetPageSkeleton />} />
+
       <Route
         path="/dashboard"
         element={

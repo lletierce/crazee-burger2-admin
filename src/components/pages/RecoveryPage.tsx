@@ -2,13 +2,13 @@ import { lazy, Suspense, useState } from 'react';
 import AuthLayout from '../layouts/AuthLayout'
 import { resetPassword } from '../../api/authService';
 import { useNavigate } from 'react-router-dom';
-import RecoveryPasswordForm from '../auth/RecoveryPassword/RecoveryPasswordForm';
-import RecoveryPasswordSendSkeleton from '../auth/RecoveryPassword/RecoveryPasswordSendSkeleton';
+import RecoveryPasswordForm from '../auth/recovery-password/RecoveryPasswordForm.tsx';
+import RecoveryPasswordSendSkeleton from '../auth/recovery-password/RecoveryPasswordSendSkeleton.tsx';
 
 export default function RecoveryPage() {
 
-    const RecoveryPasswordSend = lazy(() => import("../auth/RecoveryPassword/RecoveryPasswordSend.tsx"));
-    const RecoveryPasswordError = lazy(() => import("../auth/RecoveryPassword/RecoveryPasswordError.tsx"));
+    const RecoveryPasswordSend = lazy(() => import("../auth/recovery-password/RecoveryPasswordSend.tsx"));
+    const RecoveryPasswordError = lazy(() => import("../auth/recovery-password/RecoveryPasswordError.tsx"));
 
     const STATUS = {
         IDLE: 'default',

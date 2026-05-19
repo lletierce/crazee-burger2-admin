@@ -1,49 +1,73 @@
-import { useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { lazy, Suspense, useState } from 'react';
 import { confirmReset } from '../../api/authService';
 import AuthLayout from '../layouts/AuthLayout';
+import ResetPasswordForm from '../auth/reset-password/ResetPasswordForm.tsx';
+import RecoveryPasswordSendSkeleton from '../auth/recovery-password/RecoveryPasswordSendSkeleton.tsx';
+import { useSearchParams } from 'react-router-dom';
 
 export default function ResetPasswordPage() {
 
-  const [password, setPassword] = useState("");
+  const ResetPasswordSuccess = lazy(() => import("../auth/reset-password/ResetPasswordSuccess.tsx"));
+  const ResetPasswordError = lazy(() => import("../auth/reset-password/ResetPasswordError.tsx"));
+
   const [params] = useSearchParams();
   const oobCode = params.get("oobCode");
 
-  const navigate = useNavigate();
+  const STATUS = {
+    IDLE: 'default',
+    SUCCESS: 'success',
+    ERROR: 'error',
+  } as const;
+  type QueryStatus = (typeof STATUS)[keyof typeof STATUS];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const LOGOVARIANT = {
+    DEFAULT: 'default',
+    SUCCESS: 'success',
+    ERROR: 'error',
+    SKELETON: 'skeleton',
+  } as const;
+  type LogoVariantChoice = (typeof LOGOVARIANT)[keyof typeof LOGOVARIANT];
+
+  const [queryStatus, setQueryStatus] = useState<QueryStatus>(STATUS.IDLE);
+  const [contentTitle, setContentTitle] = useState("Changement du mot de passe")
+  const [contentLogoVariant, setContentLogoVariant] = useState<LogoVariantChoice>(LOGOVARIANT.DEFAULT)
+
+  const handleResetPassword = async (password: string) => {
 
     if (!oobCode) return;
 
-    await confirmReset(oobCode, password);
-    console.log("Mot de passe mis à jour ! -> " + { oobCode })
-    navigate("/login")
+    try {
+      await confirmReset(oobCode, password);
+      setQueryStatus(STATUS.SUCCESS)
+      setContentTitle("Mot de passe modifié!")
+      setContentLogoVariant(LOGOVARIANT.SUCCESS)
+      console.log("success - reset")
+    }
+    catch (err: any) {
+      setQueryStatus(STATUS.ERROR)
+      setContentTitle("Erreur rencontrée")
+      setContentLogoVariant(LOGOVARIANT.ERROR)
+    }
   };
+
+  
+  const content = (() => {
+    switch (queryStatus) {
+      case STATUS.IDLE:
+        return <ResetPasswordForm handlerResetPassword={handleResetPassword} />;
+      case STATUS.SUCCESS:
+        return <Suspense fallback={<RecoveryPasswordSendSkeleton />}><ResetPasswordSuccess /></Suspense>
+      case STATUS.ERROR:
+        return <Suspense fallback={<RecoveryPasswordSendSkeleton />}><ResetPasswordError /></Suspense>
+      default:
+        return <ResetPasswordForm handlerResetPassword={handleResetPassword} />;
+    }
+  })();
 
 
   return (
-    <AuthLayout title="Changement de mot de passe">
-      <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
-        <div>Indiquez le nouveau mot de passe que vous souhaitez utiliser pour votre compte.</div>
-
-        {/* {error && <p className="text-red-600">{error}</p>} TODO: add checking same password*/}
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          placeholder="Nouveau mot de passe"
-          minLength={5}
-          maxLength={30}
-          className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-        <button
-          className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition cursor-pointer"
-          type="submit">
-          Valider
-        </button>
-      </form>
+    <AuthLayout logoVariant={contentLogoVariant} title={contentTitle}>
+      {content}
     </AuthLayout>
   )
 }
